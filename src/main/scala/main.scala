@@ -16,6 +16,13 @@ object main extends App {
     .config("spark.some.config.option", "some-value")
     .getOrCreate()
 
+  val monstre = Array(
+    ("Solar", Array("etherealness", "mass", "heal", "miracle", "storm of vengeance","fire storm" ,"holy aura" ,"mass cure critical wounds")),
+    ("Bralani", Array("blur", "charm person", "gust of wind","mirror image", "wind wall"))
+  )
+
+  val rdd = sc.makeRDD(monstre)
+
   println("Hello World")
 
 }
