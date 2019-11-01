@@ -23,6 +23,14 @@ object main extends App {
 
   val rdd = sc.makeRDD(monstre)
 
-  println("Hello World")
+  val result = rdd.flatMap{
+    case(monster, sorts)=>
+      sorts.map(sort => (sort, monster))
+  }
+      .reduceByKey((a,b)=>(a+b))
+
+
+  //println(result.collect()(0)._1)
+  //result.collect().foreach(println)
 
 }
