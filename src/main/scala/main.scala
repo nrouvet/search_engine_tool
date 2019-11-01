@@ -30,15 +30,21 @@ object main extends App {
       sorts.map(sort => (sort, monster))
   }
       .reduceByKey((a,b)=>(a+","+b))
+<<<<<<< HEAD
       .mapValues(_.split(",").toArray)
 
 
+=======
+>>>>>>> master
 
 
 
   //println(result.collect()(0)._1)
   result.collect().foreach(println)
+<<<<<<< HEAD
   println(result.collect()(0)._2(0))
 
+=======
+>>>>>>> master
 
 }
