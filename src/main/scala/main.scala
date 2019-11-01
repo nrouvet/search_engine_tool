@@ -27,10 +27,11 @@ object main extends App {
     case(monster, sorts)=>
       sorts.map(sort => (sort, monster))
   }
-      .reduceByKey((a,b)=>(a+b))
+      .reduceByKey((a,b)=>(a+","+b))
+
 
 
   //println(result.collect()(0)._1)
-  //result.collect().foreach(println)
+  result.collect().foreach(println)
 
 }
