@@ -28,6 +28,7 @@ object main extends App {
       sorts.map(sort => (sort, monster))
   }
       .reduceByKey((a,b)=>(a+","+b))
+      .mapValues(_.split(",").toArray)
 
 
 
