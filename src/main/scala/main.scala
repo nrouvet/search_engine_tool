@@ -17,10 +17,8 @@ object main extends App {
     .getOrCreate()
 
   val monstre = Array(
-    ("Solar", Array("etherealness", "mass")),
-    ("Bralani", Array("etherealness", "mass","dsvodsbvsd")),
-    ("Nico", Array("etherealness", "mass")),
-    ("Emin", Array("etherealness", "mass","dsvodsbvsd"))
+    ("Solar", Array("etherealness", "mass", "heal", "miracle", "storm of vengeance","fire storm" ,"holy aura" ,"mass cure critical wounds")),
+    ("Bralani", Array("blur", "charm person", "gust of wind","mirror image", "wind wall"))
   )
 
   val rdd = sc.makeRDD(monstre)
@@ -30,21 +28,11 @@ object main extends App {
       sorts.map(sort => (sort, monster))
   }
       .reduceByKey((a,b)=>(a+","+b))
-<<<<<<< HEAD
       .mapValues(_.split(",").toArray)
-
-
-=======
->>>>>>> master
 
 
 
   //println(result.collect()(0)._1)
   result.collect().foreach(println)
-<<<<<<< HEAD
-  println(result.collect()(0)._2(0))
-
-=======
->>>>>>> master
 
 }
