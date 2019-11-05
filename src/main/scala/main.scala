@@ -9,6 +9,32 @@ import scala.util.matching.Regex
 
 object main extends App {
 
+  val url = "http://legacy.aonprd.com/bestiary/"
+  val index = "monsterIndex.html"
+
+  val regexHref = """<li><a href=".*"""".r
+  val regexSpell = new Regex("""<a[^>]*\/spells\/[^>]*\#[^>]*>(\w+[^<]+)<\/a>""")
+  val regexName ="""\#(\w+[a-z]*)""".r
+
+  val text = Source.fromURL(url+index)
+
+  val htmlPage = text.mkString
+
+  var listURL = regexHref.findAllIn(htmlPage).toList
+
+  var monster = Array.empty[(String, Array[String])]
+
+  for(i <- 0 until /*listURL.length*/1){
+
+    val nameMonster = regexName.findFirstMatchIn(listURL(i)).get.group(1)
+    val arrayUrl = listURL(i).split("\"")
+    val getMonster = arrayUrl(1)
+    val text2 = Source.fromURL(url+getMonster).mkString
+    var listSpells = List[String]()
+    regexSpell.findAllIn(text2).matchData.foreach(m => listSpells = listSpells:+ m.group(1))
+    monster = monster :+ (nameMonster, listSpells.toArray)
+  }
+
   /*val conf = new SparkConf().setAppName("BDD2").setMaster("local[*]")
   val sc = new SparkContext(conf)
   sc.setLogLevel("ERROR")
@@ -37,34 +63,6 @@ object main extends App {
 
   //println(result.collect()(0)._1)
   result.collect().foreach(println)*/
-
-  val regexHref = """<li><a href=".*"""".r
-  val regexSpell = new Regex("""<a[^>]*\/spells\/[^>]*\#[^>]*>(\w+[^<]+)<\/a>""")
-
-
-  val url = "http://legacy.aonprd.com/bestiary/"
-  val index = "monsterIndex.html"
-
-  val text = Source.fromURL(url+index)
-
-  val htmlPage = text.mkString
-
-  var listURL = regexHref.findAllIn(htmlPage).toList
-  for(i <- 0 until /*listURL.length*/1){
-
-
-
-
-    val arrayUrl = listURL(i).split("\"")
-    val monster = arrayUrl(1)
-    val text2 = Source.fromURL(url+monster).mkString
-    var listSpells = List[String]()
-    regexSpell.findAllIn(text2).matchData.foreach(m => listSpells = listSpells:+ m.group(1) )
-    println(listSpells)
-  }
-
-
-
 
 
 }
