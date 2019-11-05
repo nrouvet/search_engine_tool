@@ -8,7 +8,7 @@ import scala.io.Source
 
 object main extends App {
 
-  val conf = new SparkConf().setAppName("BDD2").setMaster("local[*]")
+  /*val conf = new SparkConf().setAppName("BDD2").setMaster("local[*]")
   val sc = new SparkContext(conf)
   sc.setLogLevel("ERROR")
 
@@ -35,7 +35,7 @@ object main extends App {
 
 
   //println(result.collect()(0)._1)
-  result.collect().foreach(println)
+  result.collect().foreach(println)*/
 
   val regexHref = """<li><a href=".*"""".r
 
@@ -47,10 +47,12 @@ object main extends App {
   val htmlPage = text.mkString
 
   var listURL = regexHref.findAllIn(htmlPage).toList
-
-  println(listURL)
-
-  listURL(0)
+  for(i <- 0 until /*listURL.length*/1){
+    val arrayUrl = listURL(i).split("\"")
+    val monster = arrayUrl(1)
+    val text2 = Source.fromURL(url+monster).mkString
+    println(text2)
+  }
 
 
 
