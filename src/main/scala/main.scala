@@ -5,6 +5,7 @@ import org.apache.spark.sql.SparkSession
 import org.apache.spark.sql.functions._
 
 import scala.io.Source
+import scala.util.matching.Regex
 
 object main extends App {
 
@@ -38,6 +39,8 @@ object main extends App {
   result.collect().foreach(println)*/
 
   val regexHref = """<li><a href=".*"""".r
+  val regexSpell = new Regex("""<a[^>]*\/spells\/[^>]*\#[^>]*>(\w+[^<]+)<\/a>""")
+
 
   val url = "http://legacy.aonprd.com/bestiary/"
   val index = "monsterIndex.html"
@@ -51,8 +54,12 @@ object main extends App {
     val arrayUrl = listURL(i).split("\"")
     val monster = arrayUrl(1)
     val text2 = Source.fromURL(url+monster).mkString
-    println(text2)
+    var listSpells = List[String]()
+    regexSpell.findAllIn(text2).matchData.foreach(m => listSpells = listSpells:+ m.group(1) )
+    println(listSpells)
   }
+
+
 
 
 
