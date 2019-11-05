@@ -2,12 +2,43 @@
 import scala.io.StdIn.readLine
 import org.apache.spark.{SparkConf, SparkContext}
 import org.apache.spark.sql.SparkSession
-import spire.std.string
+
 
 import scala.io.Source
+import scala.util.matching.Regex
 
 object main extends App {
 
+  val url = "http://legacy.aonprd.com/bestiary/"
+  val index = "monsterIndex.html"
+
+  val regexHref = """<li><a href=".*"""".r
+  val regexSpell = new Regex("""<a[^>]*\/spells\/[^>]*\#[^>]*>(\w+[^<]+)<\/a>""")
+  val regexName ="""href="(\w+[a-z]*)""".r
+
+  val text = Source.fromURL(url+index)
+
+  val htmlPage = text.mkString
+
+  var listURL = regexHref.findAllIn(htmlPage).toList
+
+  var monster = Array.empty[(String, Array[String])]
+
+  for(i <- 0 until /*listURL.length*/1){
+    val nameMonster = regexName.findFirstMatchIn(listURL(i)).get.group(1)
+    val arrayUrl = listURL(i).split("\"")
+    val getMonster = arrayUrl(1)
+    val text2 = Source.fromURL(url+getMonster).mkString
+    var listSpells = List[String]()
+    regexSpell.findAllIn(text2).matchData.foreach{
+      m =>
+        if(!listSpells.contains( m.group(1)))   //Evite les doublons
+          listSpells = listSpells:+ m.group(1)
+    }
+    monster = monster :+ (nameMonster, listSpells.toArray)
+  }
+
+  println()
   val conf = new SparkConf().setAppName("BDD2").setMaster("local[*]")
   val sc = new SparkContext(conf)
   sc.setLogLevel("ERROR")
@@ -18,12 +49,9 @@ object main extends App {
     .config("spark.some.config.option", "some-value")
     .getOrCreate()
 
-  val monstre = Array(
-    ("Solar", Array("etherealness", "mass", "heal", "miracle", "storm of vengeance","fire storm" ,"holy aura" ,"mass cure critical wounds","truck")),
-    ("Bralani", Array("blur", "charm person", "gust of wind","mirror image", "wind wall","truck"))
-  )
 
-  val rdd = sc.makeRDD(monstre)
+
+  val rdd = sc.makeRDD(monster)
 
   val result = rdd.flatMap{
     case(monster, sorts)=>
@@ -36,6 +64,7 @@ object main extends App {
 
   //println(result.collect()(0)._1)
   //result.collect().foreach(println)
+
 
   import session.implicits._
   val df = result.toDF("sort","monsters")
@@ -52,7 +81,6 @@ object main extends App {
   val reseachrSort = df.select($"monsters").filter($"sort"===nameSort)
 
   reseachrSort.show()
-
 
 
 
