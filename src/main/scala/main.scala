@@ -25,16 +25,20 @@ object main extends App {
   var monster = Array.empty[(String, Array[String])]
 
   for(i <- 0 until /*listURL.length*/1){
-
     val nameMonster = regexName.findFirstMatchIn(listURL(i)).get.group(1)
     val arrayUrl = listURL(i).split("\"")
     val getMonster = arrayUrl(1)
     val text2 = Source.fromURL(url+getMonster).mkString
     var listSpells = List[String]()
-    regexSpell.findAllIn(text2).matchData.foreach(m => listSpells = listSpells:+ m.group(1))
+    regexSpell.findAllIn(text2).matchData.foreach{
+      m =>
+        if(!listSpells.contains( m.group(1)))   //Evite les doublons
+          listSpells = listSpells:+ m.group(1)
+    }
     monster = monster :+ (nameMonster, listSpells.toArray)
   }
 
+  println()
   /*val conf = new SparkConf().setAppName("BDD2").setMaster("local[*]")
   val sc = new SparkContext(conf)
   sc.setLogLevel("ERROR")
