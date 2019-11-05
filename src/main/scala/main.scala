@@ -14,7 +14,7 @@ object main extends App {
 
   val regexHref = """<li><a href=".*"""".r
   val regexSpell = new Regex("""<a[^>]*\/spells\/[^>]*\#[^>]*>(\w+[^<]+)<\/a>""")
-  val regexName ="""\#(\w+[a-z]*)""".r
+  val regexName ="""href="(\w+[a-z]*)""".r
 
   val text = Source.fromURL(url+index)
 
