@@ -1,8 +1,8 @@
 
-import org.apache.spark.sql.functions.size
+import scala.io.StdIn.readLine
 import org.apache.spark.{SparkConf, SparkContext}
 import org.apache.spark.sql.SparkSession
-import org.apache.spark.sql.functions._
+import spire.std.string
 
 import scala.io.Source
 
@@ -19,8 +19,8 @@ object main extends App {
     .getOrCreate()
 
   val monstre = Array(
-    ("Solar", Array("etherealness", "mass", "heal", "miracle", "storm of vengeance","fire storm" ,"holy aura" ,"mass cure critical wounds")),
-    ("Bralani", Array("blur", "charm person", "gust of wind","mirror image", "wind wall"))
+    ("Solar", Array("etherealness", "mass", "heal", "miracle", "storm of vengeance","fire storm" ,"holy aura" ,"mass cure critical wounds","truck")),
+    ("Bralani", Array("blur", "charm person", "gust of wind","mirror image", "wind wall","truck"))
   )
 
   val rdd = sc.makeRDD(monstre)
@@ -35,22 +35,23 @@ object main extends App {
 
 
   //println(result.collect()(0)._1)
-  result.collect().foreach(println)
+  //result.collect().foreach(println)
 
-  val regexHref = """<li><a href=".*"""".r
+  import session.implicits._
+  val df = result.toDF("sort","monsters")
+  df.show()
 
-  val url = "http://legacy.aonprd.com/bestiary/"
-  val index = "monsterIndex.html"
 
-  val text = Source.fromURL(url+index)
+  val sorts_json = df.toJSON
+  sorts_json.take(20).foreach(println)
+  //dsorts_json.write.json("data/")
 
-  val htmlPage = text.mkString
 
-  var listURL = regexHref.findAllIn(htmlPage).toList
+  val nameSort = readLine("enter sort's name: ")
 
-  println(listURL)
+  val reseachrSort = df.select($"monsters").filter($"sort"===nameSort)
 
-  listURL(0)
+  reseachrSort.show()
 
 
 
