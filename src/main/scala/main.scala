@@ -39,7 +39,7 @@ object main extends App {
   }
 
   println()
-  /*val conf = new SparkConf().setAppName("BDD2").setMaster("local[*]")
+  val conf = new SparkConf().setAppName("BDD2").setMaster("local[*]")
   val sc = new SparkContext(conf)
   sc.setLogLevel("ERROR")
 
@@ -49,12 +49,8 @@ object main extends App {
     .config("spark.some.config.option", "some-value")
     .getOrCreate()
 
-  val monstre = Array(
-    ("Solar", Array("etherealness", "mass", "heal", "miracle", "storm of vengeance","fire storm" ,"holy aura" ,"mass cure critical wounds")),
-    ("Bralani", Array("blur", "charm person", "gust of wind","mirror image", "wind wall"))
-  )
 
-  val rdd = sc.makeRDD(monstre)
+  val rdd = sc.makeRDD(monster)
 
   val result = rdd.flatMap{
     case(monster, sorts)=>
@@ -66,7 +62,7 @@ object main extends App {
 
 
   //println(result.collect()(0)._1)
-  result.collect().foreach(println)*/
+  result.collect().foreach(println)
 
 
 }
