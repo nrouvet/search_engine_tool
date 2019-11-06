@@ -24,7 +24,8 @@ object main extends App {
 
   var monster = Array.empty[(String, Array[String])]
 
-  for(i <- 0 until /*listURL.length*/1){
+  for(i <- 0 until listURL.length){
+    //println((i*100/listURL.length) + "%")
     val nameMonster = regexName.findFirstMatchIn(listURL(i)).get.group(1)
     val arrayUrl = listURL(i).split("\"")
     val getMonster = arrayUrl(1)
@@ -68,12 +69,12 @@ object main extends App {
 
   import session.implicits._
   val df = result.toDF("sort","monsters")
-  df.show()
+  df.show(200,true)
 
 
   val sorts_json = df.toJSON
-  sorts_json.take(20).foreach(println)
-  //dsorts_json.write.json("data/")
+  //sorts_json.take(20).foreach(println)
+  //sorts_json.write.json("data/")
 
 
   val nameSort = readLine("enter sort's name: ")
