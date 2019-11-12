@@ -30,22 +30,35 @@ object exo2 extends App {
 
     var edges = Array.empty[edge]
 
-    rddGraph.flatMap{
+    for(i <- 0 until graph.length){
+        for(j<-0 until graph(i)._2.length){
+            if (graph(graph(i)._2(j)-1)._1.equipe == graph(i)._1.equipe) {
+                var tmp = new edge(graph(i)._1, graph(graph(i)._2(j)-1)._1, 50)
+                edges = edges :+ tmp
+            }
+            else {
+                var tmp = new edge(graph(i)._1, graph(graph(i)._2(j)-1)._1, 110)
+                edges = edges :+ tmp
+            }
+        }
+    }
+
+/*
+    var rddEdges = rddGraph.map{
         monster =>
-            monster._2.flatMap {
+            monster._2.map {
               value =>
                       if (graph(value-1)._1.equipe == monster._1.equipe) {
                           var tmp = new edge(monster._1, graph(value-1)._1, 50)
-                          edges = edges :+ tmp
+                          tmp
                       }
                       else {
                           var tmp = new edge(monster._1, graph(value-1)._1, 110)
-                          edges = edges :+ tmp
+                          tmp
                       }
-                  edges
           }
     }
-
+*/
     var rddEdges = sc.makeRDD(edges)
 
     print()
