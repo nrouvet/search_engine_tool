@@ -1,3 +1,4 @@
+import main.session
 import org.apache.spark.graphx.{Edge, Graph, VertexId}
 import org.apache.spark.{SparkConf, SparkContext}
 import org.apache.spark.sql.SparkSession
@@ -16,22 +17,34 @@ object exo2 extends App {
 
     val session = SparkSession
       .builder
-      .appName("")
+      .appName("truck")
       .config("spark.some.config.option", "some-value")
       .getOrCreate()
 
 
+<<<<<<< Updated upstream
     var worgs1 = new node("Worgs Rider",  "B")
     var warlord = new node("Le Warlord", "B")
     var barbare = new node("Barbares Orc", "B")
 
     var solar = new node("Solar", "A")
+=======
+    var worgs1 = new Monster(1,"Worgs Rider",  "B",33,20)
+    var warlord = new Monster(2,"Le Warlord", "B",33,20)
+    var barbare = new Monster(3,"Barbares Orc", "B",33,20)
+
+    var solar = new Monster(4,"Solar", "A",50,50)
+>>>>>>> Stashed changes
 
     var graph = Array((worgs1, Array(2,3,4)), (warlord, Array(1,4)), (barbare, Array(1,4)), (solar, Array(1,2,3)))
 
+<<<<<<< Updated upstream
     var rddGraph = sc.makeRDD(graph)
 
     var edges = ArrayBuffer.empty[edge]
+=======
+    var edges = Array.empty[edge]
+>>>>>>> Stashed changes
 
     for(i <- 0 until graph.length){
         for(j<-0 until graph(i)._2.length){
@@ -53,13 +66,19 @@ object exo2 extends App {
     } //Remove duplicates
 
     var rddEdges = sc.makeRDD(edges)
+    var rddGraph = sc.makeRDD(graph)
 
+<<<<<<< Updated upstream
     print()
 
     /*
     val nodes = sc.parallelize(Array((1L, ("Solar")), (2L, ("Pinto", )),
             (3L, ("Worgs Rider")), (4L, ("Le Warlord" ),(5L,(" Barbares Orc")))))
 
+=======
+    print(rddGraph.collect()(1))
+    println()
+>>>>>>> Stashed changes
 
     val edges = sc.parallelize(Array(Edge(1L,2L),Edge(3L,4L),Edge(4L,5L),Edge(3L,5L)))
 */
