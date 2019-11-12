@@ -5,6 +5,7 @@ import org.apache.spark.sql.SparkSession
 import scala.collection.mutable.ArrayBuffer
 
 case class node(var name : String, var equipe : String)
+//case class Monster(var id : Int, var name : String, var equipe : String, var armure: Int, var HP : Int)
 
 case class edge(var node1 : node, var node2: node, var distance : Int)
 
@@ -54,5 +55,14 @@ object exo2 extends App {
     var rddEdges = sc.makeRDD(edges)
 
     print()
+
+    /*
+    val nodes = sc.parallelize(Array((1L, ("Solar")), (2L, ("Pinto", )),
+            (3L, ("Worgs Rider")), (4L, ("Le Warlord" ),(5L,(" Barbares Orc")))))
+
+
+    val edges = sc.parallelize(Array(Edge(1L,2L),Edge(3L,4L),Edge(4L,5L),Edge(3L,5L)))
+*/
+
 
 }
