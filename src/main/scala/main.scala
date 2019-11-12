@@ -65,5 +65,26 @@ object main extends App {
     println()
   }*/
 
+  //println(result.collect()(0)._1)
+  //result.collect().foreach(println)
+
+
+  import session.implicits._
+  val df = result.toDF("sort","monsters")
+  df.show(200,true)
+
+
+  val sorts_json = df.toJSON
+  //sorts_json.take(20).foreach(println)
+  //sorts_json.write.json("data/")
+
+
+  val nameSort = readLine("enter sort's name: ")
+
+  val reseachrSort = df.select($"monsters").filter($"sort"===nameSort)
+
+  reseachrSort.show()
+
+
 
 }
