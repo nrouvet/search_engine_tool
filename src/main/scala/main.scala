@@ -5,6 +5,7 @@ import org.apache.spark.sql.SparkSession
 import org.apache.spark.sql.functions._
 
 import scala.io.Source
+import scala.util.Random
 import scala.util.matching.Regex
 
 object main extends App {
@@ -84,6 +85,8 @@ object main extends App {
   val reseachrSort = df.select($"monsters").filter($"sort"===nameSort)
 
   reseachrSort.show()
+
+
 
 
 
