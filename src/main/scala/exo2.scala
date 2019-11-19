@@ -1,10 +1,10 @@
 import main.session
 import org.apache.spark.graphx.{Edge, Graph, VertexId}
+import org.apache.spark.rdd.RDD
 import org.apache.spark.{SparkConf, SparkContext, rdd}
 import org.apache.spark.sql.SparkSession
 
 import scala.util.Random
-
 import scala.collection.script.Remove
 
 //case class Monster(var id : Int, var name : String, var equipe : String, var armure: Int, var HP : Int)
@@ -110,14 +110,10 @@ object exo2 extends App {
             if(monster.listSort(i).distance >= distance) {
                 result = monster.listSort(i)
                 listSortResult = listSortResult:+result
-
             }
-
         }
         return listSortResult
-
-
-        }
+    }
 
     def choice(monster: Monster, list : List[Sort]): Sort ={
         if(list != null){
@@ -134,12 +130,24 @@ object exo2 extends App {
 
     }*/
 
-    def attack(monster: Monster, target : Monster): Unit = {
+    def checkDead(monster : Monster, edges : RDD[edge]): Unit ={
+        if(monster.HP == 0){
+            edges = edges.collect().flatMap{
+                node => if(node.Monster1 == monster || node.Monster2 == monster){
+                    node.Monster1 = null
+                    edges.filter(x => (x.Monster1 != null))
+                }
+            }
+        }
+    }
+
+    def attack(monster: Monster, target : Monster, edges : RDD[edge]): Unit = {
         val r = new Random()
         var rand = 1 + r.nextInt(19)
         val chosenSort = choice(monster,SortChoice(monster, findDistanceUsingDF(monster, target)))
         if(rand + chosenSort.listPower(monster.counterAtt) >= target.armure){
             monster.Attack(target,  chosenSort)
+            checkDead(target, edges)
         }
     }
 
