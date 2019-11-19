@@ -22,8 +22,8 @@ object exo2 extends App {
       .config("spark.some.config.option", "some-value")
       .getOrCreate()
 
-    var testAttackProche = new Sort("ntm",false,20,120)
-    var testAttackLoin = new Sort("fdp",false,20,120)
+    var testAttackProche = new Sort("ntm",false,List(35,30,25,20),50, 3, 6)
+    var testAttackLoin = new Sort("fdp",false,List(30, 25, 20),120, 2, 6)
 
     var listSort = List(testAttackLoin,testAttackProche)
 
@@ -34,7 +34,7 @@ object exo2 extends App {
     var warlord = new Monster(2,"Le Warlord", "B",33,20,List(null), 0, 1)
     var barbare = new Monster(3,"Barbares Orc", "B",33,20,List(null), 0, 1)
 
-    var solar = new Monster(4,"Solar", "A",50,50,List(testAttackProche,testAttackLoin))
+    var solar = new Monster(4,"Solar", "A",50,50,List(testAttackProche,testAttackLoin), 0, 4)
 
     var graph = Array((worgs1, Array(2,3,4)), (warlord, Array(1,4)), (barbare, Array(1,4)), (solar, Array(1,2,3,4)))
 
