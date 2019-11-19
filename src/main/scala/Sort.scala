@@ -1,9 +1,9 @@
-case class Sort (var name: String, var typeSort: Boolean , var power: Int, distance: Int ) {
+case class Sort (var name: String, var typeSort: Boolean , var listPower : List[Int], distance: Int, var low : Int, var high : Int) {
 
 
 
   def this(){
-    this("sort",false,0,0)
+    this("sort",false,List.empty[Int],0, 0, 1)
   }
 
 }

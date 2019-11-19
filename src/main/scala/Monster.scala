@@ -1,7 +1,9 @@
 import com.sun.prism.impl.Disposer.Target
 import org.apache.spark.sql.catalyst.plans.logical.Sort
 
-case class Monster(var id : Int, var name : String, var equipe : String, var armure: Int, var HP : Int, var listSort: List[Sort] ) {
+import scala.util.Random
+
+case class Monster(var id : Int, var name : String, var equipe : String, var armure: Int, var HP : Int, var listSort: List[Sort], var counterAtt : Int, var maxAtt : Int) {
 //case class Monster(var id : Int, var name : String, var equipe : String, var armure: Int, var HP : Int){
 
   def Damage (reduceHP : Int): Unit ={
@@ -10,11 +12,16 @@ case class Monster(var id : Int, var name : String, var equipe : String, var arm
   def Heal (increaseHP : Int): Unit ={
     this.HP += increaseHP
   }
-  def Attack(target : Monster , sort: Sort ): Unit ={
-    if(sort.typeSort == false)
-    target.Damage(sort.power)
+
+
+  def Attack(target : Monster , sort: Sort): Unit ={
+    val r = new Random()
+    val rand = sort.low + r.nextInt(sort.high - sort.low)
+    if(sort.typeSort == false){
+      target.Damage(sort.listPower(counterAtt) + rand)
+    }
     else
-      target.Heal(sort.power)
+      target.Heal(sort.listPower(counterAtt) + rand)
   }
 
 

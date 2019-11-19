@@ -3,6 +3,8 @@ import org.apache.spark.graphx.{Edge, Graph, VertexId}
 import org.apache.spark.{SparkConf, SparkContext, rdd}
 import org.apache.spark.sql.SparkSession
 
+import scala.util.Random
+
 import scala.collection.script.Remove
 
 //case class Monster(var id : Int, var name : String, var equipe : String, var armure: Int, var HP : Int)
@@ -28,9 +30,9 @@ object exo2 extends App {
     println(listSort)
 
 
-    var worgs1 = new Monster(1,"Worgs Rider",  "B",33,20,List(null))
-    var warlord = new Monster(2,"Le Warlord", "B",33,20,List(null))
-    var barbare = new Monster(3,"Barbares Orc", "B",33,20,List(null))
+    var worgs1 = new Monster(1,"Worgs Rider",  "B",33,20,List(null), 0, 1)
+    var warlord = new Monster(2,"Le Warlord", "B",33,20,List(null), 0, 1)
+    var barbare = new Monster(3,"Barbares Orc", "B",33,20,List(null), 0, 1)
 
     var solar = new Monster(4,"Solar", "A",50,50,List(testAttackProche,testAttackLoin))
 
@@ -100,22 +102,6 @@ object exo2 extends App {
 
     }
 */
-    def FindSorts_and_Attack(monster: Monster, target:Monster): Unit =
-    {
-
-        monster.listSort.foreach(e => {
-            if(e.distance > findDistanceUsingDF(monster,target)){
-
-                println("use" + e.name + "c'est très effice")
-            }
-            else
-                println("impossible to find a sort to attack")
-        })
-
-
-    }
-
-
     //OK choix sort en fonction de la distaance entre monstre
     def SortChoice(monster: Monster, distance: Int):List[Sort]={
         var result = new Sort()
@@ -132,6 +118,30 @@ object exo2 extends App {
 
 
         }
+
+    def choice(monster: Monster, list : List[Sort]): Sort ={
+        if(list != null){
+            val r = new Random()
+            val rand = r.nextInt(list.size)
+            list(rand)
+        }
+        null
+    }
+
+  /*  def attackOrRegen(monster: Monster): Boolean ={
+        val r = new Random()
+        val rand = r.nextInt(0)
+
+    }*/
+
+    def attack(monster: Monster, target : Monster): Unit = {
+        val r = new Random()
+        var rand = 1 + r.nextInt(19)
+        val choosenSort = choice(monster,SortChoice(monster, findDistanceUsingDF(monster, target)))
+        if(rand + choosenSort.listPower(monster.counterAtt) >= target.armure){
+            monster.Attack(target,  choosenSort)
+        }
+    }
 
 
     println(findDistanceUsingDF(solar, warlord))
