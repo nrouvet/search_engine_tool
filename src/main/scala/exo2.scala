@@ -30,11 +30,11 @@ object exo2 extends App {
     println(listSort)
 
 
-    var worgs1 = new Monster(1,"Worgs Rider",  "B",33,20,List(null), 0, 1)
-    var warlord = new Monster(2,"Le Warlord", "B",33,20,List(null), 0, 1)
-    var barbare = new Monster(3,"Barbares Orc", "B",33,20,List(null), 0, 1)
+    var worgs1 = new Monster(1,"Worgs Rider",  "B",33,20,List(null),  1)
+    var warlord = new Monster(2,"Le Warlord", "B",33,20,List(null),  1)
+    var barbare = new Monster(3,"Barbares Orc", "B",33,20,List(null), 1)
 
-    var solar = new Monster(4,"Solar", "A",50,50,List(testAttackProche,testAttackLoin), 0, 4)
+    var solar = new Monster(4,"Solar", "A",50,50,List(testAttackProche,testAttackLoin), 4)
 
     var graph = Array((worgs1, Array(2,3,4)), (warlord, Array(1,4)), (barbare, Array(1,4)), (solar, Array(1,2,3,4)))
 
@@ -137,9 +137,9 @@ object exo2 extends App {
     def attack(monster: Monster, target : Monster): Unit = {
         val r = new Random()
         var rand = 1 + r.nextInt(19)
-        val choosenSort = choice(monster,SortChoice(monster, findDistanceUsingDF(monster, target)))
-        if(rand + choosenSort.listPower(monster.counterAtt) >= target.armure){
-            monster.Attack(target,  choosenSort)
+        val chosenSort = choice(monster,SortChoice(monster, findDistanceUsingDF(monster, target)))
+        if(rand + chosenSort.listPower(monster.counterAtt) >= target.armure){
+            monster.Attack(target,  chosenSort)
         }
     }
 

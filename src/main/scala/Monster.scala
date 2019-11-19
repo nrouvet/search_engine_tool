@@ -3,14 +3,19 @@ import org.apache.spark.sql.catalyst.plans.logical.Sort
 
 import scala.util.Random
 
-case class Monster(var id : Int, var name : String, var equipe : String, var armure: Int, var HP : Int, var listSort: List[Sort], var counterAtt : Int, var maxAtt : Int) {
+case class Monster(var id : Int, var name : String, var equipe : String, var armure: Int, var HP : Int, var listSort: List[Sort], val maxAtt : Int) {
 //case class Monster(var id : Int, var name : String, var equipe : String, var armure: Int, var HP : Int){
+
+  val maxHP = HP
+  var counterAtt = 0
 
   def Damage (reduceHP : Int): Unit ={
     this.HP -= reduceHP
+    if(this.HP < 0) this.HP = 0
   }
   def Heal (increaseHP : Int): Unit ={
     this.HP += increaseHP
+    if(this.HP > maxHP) this.HP = maxHP
   }
 
 
