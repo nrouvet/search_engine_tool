@@ -20,8 +20,8 @@ object exo2 extends App {
       .config("spark.some.config.option", "some-value")
       .getOrCreate()
 
-    var testAttackProche = new Sort("ntm",false,20,110)
-    var testAttackLoin = new Sort("fdp",false,20,50)
+    var testAttackProche = new Sort("ntm",false,20,120)
+    var testAttackLoin = new Sort("fdp",false,20,120)
 
     var listSort = List(testAttackLoin,testAttackProche)
 
@@ -116,21 +116,27 @@ object exo2 extends App {
     }
 
 
-    def SortChoice(monster: Monster, distance: Int){
+    //OK choix sort en fonction de la distaance entre monstre
+    def SortChoice(monster: Monster, distance: Int):List[Sort]={
+        var result = new Sort()
+        var listSortResult = List.empty[Sort]
+        for (i <- 0 until monster.listSort.length) {
+            if(monster.listSort(i).distance >= distance) {
+                result = monster.listSort(i)
+                listSortResult = listSortResult:+result
 
-        for (i <- 0 to monster.listSort.length) {
-
-                var result = monster.listSort.head
-                return result
+            }
 
         }
+        return listSortResult
+
 
         }
 
 
     println(findDistanceUsingDF(solar, warlord))
     //FindSorts_and_Attack(solar,warlord)
-    println(SortChoice(solar,60))
+    println(SortChoice(solar,findDistanceUsingDF(solar,warlord)))
 
 
 
