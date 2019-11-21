@@ -1,4 +1,3 @@
-import main.session
 import org.apache.spark.graphx.{Edge, Graph, VertexId}
 import org.apache.spark.rdd.RDD
 import org.apache.spark.{SparkConf, SparkContext, rdd}
@@ -22,19 +21,19 @@ object exo2 extends App {
       .config("spark.some.config.option", "some-value")
       .getOrCreate()
 
-    var testAttackProche = new Sort("ntm",false,List(35,30,25,20),50, 3, 6)
-    var testAttackLoin = new Sort("fdp",false,List(30, 25, 20),120, 2, 6)
+    var testAttackProche = Sort("ntm",false,List(35,30,25,20),50, 3, 6)
+    var testAttackLoin = Sort("fdp",false,List(30, 25, 20),120, 2, 6)
 
     var listSort = List(testAttackLoin,testAttackProche)
 
     println(listSort)
 
 
-    var worgs1 = new Monster(1,"Worgs Rider",  "B",33,20,List(null),  1)
-    var warlord = new Monster(2,"Le Warlord", "B",33,20,List(null),  1)
-    var barbare = new Monster(3,"Barbares Orc", "B",33,20,List(null), 1)
+    var worgs1 = Monster(1,"Worgs Rider",  "B",33,20,List(null),  1)
+    var warlord = Monster(2,"Le Warlord", "B",33,20,List(null),  1)
+    var barbare = Monster(3,"Barbares Orc", "B",33,20,List(null), 1)
 
-    var solar = new Monster(4,"Solar", "A",50,50,List(testAttackProche,testAttackLoin), 4)
+    var solar = Monster(4,"Solar", "A",50,50,List(testAttackProche,testAttackLoin), 4)
 
     var graph = Array((worgs1, Array(2,3,4)), (warlord, Array(1,4)), (barbare, Array(1,4)), (solar, Array(1,2,3,4)))
 
@@ -43,11 +42,11 @@ object exo2 extends App {
     for(i <- 0 until graph.length){
         for(j<-0 until graph(i)._2.length){
             if (graph(graph(i)._2(j)-1)._1.equipe == graph(i)._1.equipe) {
-                var tmp = new edge(graph(i)._1, graph(graph(i)._2(j)-1)._1, 50)
+                var tmp = edge(graph(i)._1, graph(graph(i)._2(j)-1)._1, 50)
                 edges = edges :+ tmp
             }
             else {
-                var tmp = new edge(graph(i)._1, graph(graph(i)._2(j)-1)._1, 110)
+                var tmp = edge(graph(i)._1, graph(graph(i)._2(j)-1)._1, 110)
                 edges = edges :+ tmp
             }
         }
@@ -119,7 +118,7 @@ object exo2 extends App {
         if(list != null){
             val r = new Random()
             val rand = r.nextInt(list.size)
-            list(rand)
+            return list(rand)
         }
         null
     }
@@ -132,12 +131,19 @@ object exo2 extends App {
 
     def checkDead(monster : Monster, edges : RDD[edge]): Unit ={
         if(monster.HP == 0){
-            edges = edges.collect().flatMap{
-                node => if(node.Monster1 == monster || node.Monster2 == monster){
-                    node.Monster1 = null
-                    edges.filter(x => (x.Monster1 != null))
+            var tmp = edges.collect().map{
+                node => if(node.Monster1.id == monster.id || node.Monster2.id == monster.id){
+                    (null, node.Monster2, node.distance)
                 }
+
+            /*var tmp = edges.collect().foreach{
+                node => if(node.Monster1.id == monster.id || node.Monster2.id == monster.id){
+                    node.Monster1 = null
+                }*/
             }
+
+            print()
+
         }
     }
 
@@ -145,17 +151,18 @@ object exo2 extends App {
         val r = new Random()
         var rand = 1 + r.nextInt(19)
         val chosenSort = choice(monster,SortChoice(monster, findDistanceUsingDF(monster, target)))
-        if(rand + chosenSort.listPower(monster.counterAtt) >= target.armure){
+        if(rand + chosenSort.listPower(monster.counterAtt) >= /*target.armure*/0){
             monster.Attack(target,  chosenSort)
             checkDead(target, edges)
+            print()
         }
     }
 
 
-    println(findDistanceUsingDF(solar, warlord))
+    //println(findDistanceUsingDF(solar, warlord))
     //FindSorts_and_Attack(solar,warlord)
-    println(SortChoice(solar,findDistanceUsingDF(solar,warlord)))
-
+    //println(SortChoice(solar,findDistanceUsingDF(solar,warlord)))
+    attack(solar, worgs1, rddEdges)
 
 
 
