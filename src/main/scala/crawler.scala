@@ -4,6 +4,8 @@ import org.apache.spark.rdd.RDD
 import org.apache.spark.{SparkConf, SparkContext}
 import org.apache.spark.sql.SparkSession
 
+import scala.collection.mutable
+import scala.collection.mutable.ListBuffer
 import scala.io.Source
 import scala.util.matching.Regex
 
@@ -18,6 +20,7 @@ object crawler extends App {
 
     //We will browse all the links we get previously to get all the sorts of all the monsters
     for(i <- 0 until listURL.length){
+      try{
       val nameMonster = regexName.findFirstMatchIn(listURL(i)).get.group(1)   //We have a create a group with the regex in the brackets, we get the result with "get.group(1)
       val arrayUrl = listURL(i).split("\"")  //Here we get the value of the link without the href or the quotation marks
       val getMonster = arrayUrl(1)
@@ -28,7 +31,11 @@ object crawler extends App {
           if(!listSpells.contains( m.group(1)))   //Avoid duplication
             listSpells = listSpells:+ m.group(1)
       }
-      monster = monster :+ (nameMonster, listSpells.toArray)  //We create our couple of monster and their sorts and we add if to our list monster
+      monster = monster :+ (nameMonster, listSpells.toArray) } //We create our couple of monster and their sorts and we add if to our list monster
+      catch {
+        case _: Throwable => println("error")
+        println(i)
+      }
     }
 
     monster
@@ -49,6 +56,31 @@ object crawler extends App {
     pw.close()
   }
 
+  def removeDuplicateAndDifferentesType(bufferURL : mutable.Buffer[String], bufferURL2 : mutable.Buffer[String]): List[String] ={
+    var monsterType = """(\w*).html""".r
+    for(i <- 0 until bufferURL2.size){
+      bufferURL2(i) = bufferURL2(i).replace("-", " ")
+      listType = listType :+ monsterType.findFirstMatchIn(bufferURL2(i)).get.group(1).toString
+    }
+
+    listType = listType.distinct
+
+    var ind = 0
+    for(i <- 0 until bufferURL.size){
+      var checkDuplicate = monsterType.findFirstMatchIn(bufferURL(ind)).get.group(1).toString
+      if(listType.contains(checkDuplicate)){
+        bufferURL -= bufferURL(ind)
+        ind -= 1
+      }
+      ind+=1
+    }
+
+    var listURL = bufferURL.toList
+    listURL = listURL ++ bufferURL2.toList
+
+    listURL
+  }
+
   var monster = Array.empty[(String, Array[String])] //To store the monsters and theirs sorts
   var listURL = List.empty[String]
   var listType = List.empty[String]
@@ -56,7 +88,6 @@ object crawler extends App {
   //Regex part
   var regexHref = """<li><a href=".*"""".r
   var regexDifferentTypeOfSameMonster = """<li>&nbsp;&nbsp;<a href=".*"""".r
-  var monsterType = """(\w*).html""".r
 
   //Page 1
   var url = "http://legacy.aonprd.com/bestiary/"  //link of the bestiary
@@ -67,35 +98,22 @@ object crawler extends App {
   var bufferURL = regexHref.findAllIn(htmlPage).toBuffer    //Find all the href link of the page with the regex and make a buffer with the result
 
   var bufferURL2 = regexDifferentTypeOfSameMonster.findAllIn(htmlPage).toBuffer
-  for(i <- 0 until bufferURL2.size){
-    bufferURL2(i) = bufferURL2(i).replace("-", " ")
-    listType = listType :+ monsterType.findFirstMatchIn(bufferURL2(i)).get.group(1).toString
-  }
 
-  listType = listType.distinct
-
-  var ind = 0
-  for(i <- 0 until bufferURL.size){
-    var checkDuplicate = monsterType.findFirstMatchIn(bufferURL(ind)).get.group(1).toString
-    if(listType.contains(checkDuplicate)){
-      bufferURL -= bufferURL(ind)
-      ind -= 1
-    }
-    ind+=1
-  }
-
-  listURL = bufferURL.toList
-  listURL = listURL ++ bufferURL2.toList
+  listURL = removeDuplicateAndDifferentesType(bufferURL, bufferURL2)
 
   monster = monster ++ createListMonster(url, listURL)
-/*
+
   //Page 2
   url = "http://legacy.aonprd.com/bestiary2/"
   index = "additionalMonsterIndex.html#"
 
   text = Source.fromURL(url+index)
   htmlPage = text.mkString
-  listURL = regexHref.findAllIn(htmlPage).toList
+  bufferURL = regexHref.findAllIn(htmlPage).toBuffer
+
+  bufferURL2 = regexDifferentTypeOfSameMonster.findAllIn(htmlPage).toBuffer
+
+  listURL = removeDuplicateAndDifferentesType(bufferURL, bufferURL2)
 
   monster = monster ++ createListMonster(url, listURL)
 
@@ -106,7 +124,11 @@ object crawler extends App {
 
     text = Source.fromURL(url+index)
     htmlPage = text.mkString
-    listURL = regexHref.findAllIn(htmlPage).toList
+    bufferURL = regexHref.findAllIn(htmlPage).toBuffer
+
+    bufferURL2 = regexDifferentTypeOfSameMonster.findAllIn(htmlPage).toBuffer
+
+    listURL = removeDuplicateAndDifferentesType(bufferURL, bufferURL2)
 
     monster = monster ++ createListMonster(url, listURL)
   }
@@ -121,7 +143,7 @@ object crawler extends App {
   htmlPage = text.mkString
   listURL = regexHref.findAllIn(htmlPage).toList
 
-  monster = monster ++ createListMonster(url, listURL)*/
+  monster = monster ++ createListMonster(url, listURL)
 
 
   val conf = new SparkConf().setAppName("BDD2").setMaster("local[*]")
