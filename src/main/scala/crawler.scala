@@ -42,16 +42,22 @@ object crawler extends App {
 
   def toJson(listSort : RDD[(String, Array[String])]) = {
     val pw = new PrintWriter(new File("sort.json"))
+    pw.write("[\n")
     for(i <- 0 until listSort.collect().size){
       pw.write("{\"name\":\""+listSort.collect()(i)._1+"\",\n\"monsters\":[\n")
       for(j<-0 until listSort.collect()(i)._2.size){
         if(j == listSort.collect()(i)._2.size-1) {
-          pw.write("\""+listSort.collect()(i)._2(j) + "\"\n")
+          pw.write("\""+listSort.collect()(i)._2(j) + "\"")
         }
         else pw.write("\"" + listSort.collect()(i)._2(j) + "\",\n")
       }
-      pw.write("\n]\n},\n")
+      if(i == listSort.collect().length-1) {
+        pw.write("\n]\n}\n")
+      }
+      else
+        pw.write("\n]\n},\n")
     }
+    pw.write("]")
     pw.close()
   }
 
@@ -187,9 +193,9 @@ object crawler extends App {
     .reduceByKey((a,b)=>(a+"!"+b))    //Then we reduce by key, so we group the monster by sort to inverse the couple to (sort, list(monster))
     .mapValues(_.split("!").toArray)  //We create an array with the string create by the reduceByKey
 
-  println("Starting write Spark format json...")
-  toJsonSpark(result)
-  println("Spark format json ok")
+  //println("Starting write Spark format json...")
+  //toJsonSpark(result)
+  //println("Spark format json ok")
 
   println("Starting write json...")
   toJson(result)
