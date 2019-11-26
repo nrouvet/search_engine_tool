@@ -174,6 +174,7 @@ object exo2 extends App {
 
     var myRDD = rddGraph.flatMap(monster => {
         val messageMonster = new ArrayBuffer[(Int, String)]
+        messageMonster += Tuple2(1,"beau")
         messageMonster
     })
 
@@ -190,7 +191,9 @@ object exo2 extends App {
     //FindSorts_and_Attack(solar,warlord)
     //println(SortChoice(solar,findDistanceUsingDF(solar,warlord)))
     var msg = sc.makeRDD(attack(solar, worgs1, rddEdges,myRDD))
-    var test = msg.toDF()
+    var test = msg.join(myRDD).toDF()
+
+    
     test.show()
 
 
