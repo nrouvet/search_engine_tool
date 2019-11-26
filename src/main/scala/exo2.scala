@@ -130,24 +130,6 @@ object exo2 extends App {
 
     }*/
 
-    def checkDead(monster : Monster, edges : RDD[edge]): Unit ={
-        if(monster.HP == 0){
-            var tmp = edges.collect().map{
-                node => if(node.Monster1.id == monster.id || node.Monster2.id == monster.id){
-                    (null, node.Monster2, node.distance)
-                }
-
-            /*var tmp = edges.collect().foreach{
-                node => if(node.Monster1.id == monster.id || node.Monster2.id == monster.id){
-                    node.Monster1 = null
-                }*/
-            }
-
-            print()
-
-        }
-    }
-
     def attack(monster: Monster, target : Monster, edges : RDD[edge], msg : RDD[(Int, String)]): ArrayBuffer[(Int,String)] = {
         val r = new Random()
         var rand = 1 + r.nextInt(19)
@@ -164,7 +146,6 @@ object exo2 extends App {
                 messageMonster += Tuple2(target.id , target.HP.toString)
             }
 
-            //checkDead(target, edges)
             print()
 
         }
@@ -191,18 +172,9 @@ object exo2 extends App {
     //FindSorts_and_Attack(solar,warlord)
     //println(SortChoice(solar,findDistanceUsingDF(solar,warlord)))
     var msg = sc.makeRDD(attack(solar, worgs1, rddEdges,myRDD))
-    var test = msg.join(myRDD).toDF()
-
+    var test = msg.union(myRDD).reduceByKey((a,b)=>a+","+b).toDF()
     
     test.show()
-
-
-
-    /*
-    val test = myRDD.toDF()
-    test.show()
-*/
-
 
 
 
