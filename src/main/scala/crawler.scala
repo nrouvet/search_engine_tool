@@ -15,7 +15,7 @@ object crawler extends App {
     var monster = Array.empty[(String, Array[String])]
 
     //Regex part 2
-    val regexName ="""#([a-z\s\-]*)""".r
+    val regexName ="""#([a-z\s\-\,]*)""".r
     val regexSpell = new Regex("""<a[^>]*\/spells\/[^>]*\#[^>]*>(\w+[^<]+)<\/a>""")  //Regex to get the spells
 
     //We will browse all the links we get previously to get all the sorts of all the monsters
@@ -37,14 +37,28 @@ object crawler extends App {
         println(i)
       }
     }
-
     monster
   }
 
   def toJson(listSort : RDD[(String, Array[String])]) = {
     val pw = new PrintWriter(new File("sort.json"))
     for(i <- 0 until listSort.collect().size){
-      pw.write("{\""+listSort.collect()(i)._1+"\",[")
+      pw.write("{\"name\":\""+listSort.collect()(i)._1+"\",\n\"monsters\":[\n")
+      for(j<-0 until listSort.collect()(i)._2.size){
+        if(j == listSort.collect()(i)._2.size-1) {
+          pw.write("\""+listSort.collect()(i)._2(j) + "\"\n")
+        }
+        else pw.write("\"" + listSort.collect()(i)._2(j) + "\",\n")
+      }
+      pw.write("\n]\n},\n")
+    }
+    pw.close()
+  }
+
+  def toJsonSpark(listSort : RDD[(String, Array[String])]) = {
+    val pw = new PrintWriter(new File("sort_spark.json"))
+    for(i <- 0 until listSort.collect().size){
+      pw.write("{\"name\":\""+listSort.collect()(i)._1+"\",\"monsters\":[")
       for(j<-0 until listSort.collect()(i)._2.size){
         if(j == listSort.collect()(i)._2.size-1) {
           pw.write("\""+listSort.collect()(i)._2(j) + "\"")
@@ -93,15 +107,17 @@ object crawler extends App {
   var url = "http://legacy.aonprd.com/bestiary/"  //link of the bestiary
   var index = "monsterIndex.html"   //part of the link to get the index of the monsters
 
-  var text = Source.fromURL(url+index)
-  var htmlPage = text.mkString    //Convert the HTML code of the page to a string
-  var bufferURL = regexHref.findAllIn(htmlPage).toBuffer    //Find all the href link of the page with the regex and make a buffer with the result
+    var text = Source.fromURL(url+index)
+    var htmlPage = text.mkString    //Convert the HTML code of the page to a string
+    var bufferURL = regexHref.findAllIn(htmlPage).toBuffer    //Find all the href link of the page with the regex and make a buffer with the result
 
-  var bufferURL2 = regexDifferentTypeOfSameMonster.findAllIn(htmlPage).toBuffer
+    var bufferURL2 = regexDifferentTypeOfSameMonster.findAllIn(htmlPage).toBuffer
 
-  listURL = removeDuplicateAndDifferentesType(bufferURL, bufferURL2)
+    listURL = removeDuplicateAndDifferentesType(bufferURL, bufferURL2)
 
-  monster = monster ++ createListMonster(url, listURL)
+    monster = monster ++ createListMonster(url, listURL)
+
+    println("Page 1 ok")
 
   //Page 2
   url = "http://legacy.aonprd.com/bestiary2/"
@@ -117,6 +133,8 @@ object crawler extends App {
 
   monster = monster ++ createListMonster(url, listURL)
 
+  println("Page 2 ok")
+
   //Page 3 et 4
   for(i <- 3 to 4){
     url = "http://legacy.aonprd.com/bestiary"+i+"/"
@@ -131,6 +149,8 @@ object crawler extends App {
     listURL = removeDuplicateAndDifferentesType(bufferURL, bufferURL2)
 
     monster = monster ++ createListMonster(url, listURL)
+
+    println("Page " + i +" ok")
   }
 
   //Page 5
@@ -145,6 +165,7 @@ object crawler extends App {
 
   monster = monster ++ createListMonster(url, listURL)
 
+  println("Page 5 ok")
 
   val conf = new SparkConf().setAppName("BDD2").setMaster("local[*]")
   val sc = new SparkContext(conf)
@@ -163,10 +184,14 @@ object crawler extends App {
     case(monster, sorts)=>
       sorts.map(sort => (sort, monster))  //For all the sort of each monster, we create a couple of (sort,monster)
   }
-    .reduceByKey((a,b)=>(a+","+b))    //Then we reduce by key, so we group the monster by sort to inverse the couple to (sort, list(monster))
-    .mapValues(_.split(",").toArray)  //We create an array with the string create by the reduceByKey
+    .reduceByKey((a,b)=>(a+"!"+b))    //Then we reduce by key, so we group the monster by sort to inverse the couple to (sort, list(monster))
+    .mapValues(_.split("!").toArray)  //We create an array with the string create by the reduceByKey
 
-  println("Json in progress...")
+  println("Starting write Spark format json...")
+  toJsonSpark(result)
+  println("Spark format json ok")
+
+  println("Starting write json...")
   toJson(result)
   println("Json ok")
 
