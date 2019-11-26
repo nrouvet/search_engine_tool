@@ -148,7 +148,7 @@ object exo2 extends App {
         }
     }
 
-    def attack(monster: Monster, target : Monster, edges : RDD[edge], msg : RDD[(Int, String)]): Unit = {
+    def attack(monster: Monster, target : Monster, edges : RDD[edge], msg : RDD[(Int, String)]): ArrayBuffer[(Int,String)] = {
         val r = new Random()
         var rand = 1 + r.nextInt(19)
         var messageMonster = new ArrayBuffer[(Int,String)]()
@@ -169,6 +169,7 @@ object exo2 extends App {
 
         }
         messageMonster.foreach(println)
+        messageMonster
     }
 
     var myRDD = rddGraph.flatMap(monster => {
@@ -188,8 +189,10 @@ object exo2 extends App {
     //println(findDistanceUsingDF(solar, warlord))
     //FindSorts_and_Attack(solar,warlord)
     //println(SortChoice(solar,findDistanceUsingDF(solar,warlord)))
-    attack(solar, worgs1, rddEdges,myRDD)
-    
+    var msg = sc.makeRDD(attack(solar, worgs1, rddEdges,myRDD))
+    var test = msg.toDF()
+    test.show()
+
 
 
     /*
