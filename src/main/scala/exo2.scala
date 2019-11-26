@@ -3,6 +3,7 @@ import org.apache.spark.rdd.RDD
 import org.apache.spark.{SparkConf, SparkContext, rdd}
 import org.apache.spark.sql.SparkSession
 
+import scala.collection.mutable.{ArrayBuffer, ListBuffer}
 import scala.util.Random
 import scala.collection.script.Remove
 
@@ -147,26 +148,57 @@ object exo2 extends App {
         }
     }
 
-    def attack(monster: Monster, target : Monster, edges : RDD[edge]): Unit = {
+    def attack(monster: Monster, target : Monster, edges : RDD[edge], msg : RDD[(Int, String)]): ArrayBuffer[(Int,String)] = {
         val r = new Random()
         var rand = 1 + r.nextInt(19)
+        var messageMonster = new ArrayBuffer[(Int,String)]()
         val chosenSort = choice(monster,SortChoice(monster, findDistanceUsingDF(monster, target)))
-        if(rand + chosenSort.listPower(monster.counterAtt) >= /*target.armure*/0){
+        if(rand + chosenSort.listPower(monster.counterAtt) >= target.armure){
+            messageMonster += Tuple2(monster.id,"test")
             monster.Attack(target,  chosenSort)
-            checkDead(target, edges)
+            if(target.HP == 0){
+                messageMonster += Tuple2(target.id ,"dead")
+
+            }
+            else{
+                messageMonster += Tuple2(target.id , target.HP.toString)
+            }
+
+            //checkDead(target, edges)
             print()
+
         }
+        messageMonster.foreach(println)
+        messageMonster
     }
+
+    var myRDD = rddGraph.flatMap(monster => {
+        val messageMonster = new ArrayBuffer[(Int, String)]
+        messageMonster
+    })
+
+
+    /*
+    myRDD.map(monster => {
+        var id = monster._1
+        var mymsg = sc.broadcast(id)
+
+    })*/
 
 
     //println(findDistanceUsingDF(solar, warlord))
     //FindSorts_and_Attack(solar,warlord)
     //println(SortChoice(solar,findDistanceUsingDF(solar,warlord)))
-    attack(solar, worgs1, rddEdges)
+    var msg = sc.makeRDD(attack(solar, worgs1, rddEdges,myRDD))
+    var test = msg.toDF()
+    test.show()
 
 
 
-
+    /*
+    val test = myRDD.toDF()
+    test.show()
+*/
 
 
 
