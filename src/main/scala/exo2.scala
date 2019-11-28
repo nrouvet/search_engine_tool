@@ -1,18 +1,18 @@
-import org.apache.spark.graphx.{Edge, Graph, VertexId}
 import org.apache.spark.rdd.RDD
-import org.apache.spark.{SparkConf, SparkContext, rdd}
+import org.apache.spark.{SparkConf, SparkContext}
 import org.apache.spark.sql.SparkSession
 
-import scala.collection.mutable.{ArrayBuffer, ListBuffer}
+import scala.collection.mutable.ArrayBuffer
 import scala.util.Random
-import scala.collection.script.Remove
 
-//case class Monster(var id : Int, var name : String, var equipe : String, var armure: Int, var HP : Int)
 
 case class edge(var Monster1 : Monster, var Monster2: Monster, var distance : Int)
 
 object exo2 extends App {
-    val conf = new SparkConf().setAppName("BDDExo2").setMaster("local[*]")
+
+    val conf = new SparkConf()
+      .setAppName("BDDExo2")
+      .setMaster("local[*]")
     val sc = new SparkContext(conf)
     sc.setLogLevel("ERROR")
 
@@ -22,8 +22,8 @@ object exo2 extends App {
       .config("spark.some.config.option", "some-value")
       .getOrCreate()
 
-    var testAttackProche = Sort("ntm",false,List(35,30,25,20),50, 3, 6)
-    var testAttackLoin = Sort("fdp",false,List(30, 25, 20),120, 2, 6)
+    var testAttackProche = Sort("sword",false,List(35,30,25,20),50, 3, 6)
+    var testAttackLoin = Sort("elbow",false,List(30, 25, 20),120, 2, 6)
 
     var listSort = List(testAttackLoin,testAttackProche)
 
@@ -124,11 +124,15 @@ object exo2 extends App {
         null
     }
 
-  /*  def attackOrRegen(monster: Monster): Boolean ={
+    def attackOrRegen(monster: Monster): Boolean ={
         val r = new Random()
-        val rand = r.nextInt(0)
-
-    }*/
+        val rand = r.nextInt(100)
+        val odd = monster.HP * 100 / monster.maxHP
+        if(odd + 20 < odd){
+            true
+        }
+        else false
+    }
 
     def attack(monster: Monster, target : Monster, edges : RDD[edge], msg : RDD[(Int, String)]): ArrayBuffer[(Int,String)] = {
         val r = new Random()
@@ -172,10 +176,31 @@ object exo2 extends App {
     //FindSorts_and_Attack(solar,warlord)
     //println(SortChoice(solar,findDistanceUsingDF(solar,warlord)))
     var msg = sc.makeRDD(attack(solar, worgs1, rddEdges,myRDD))
-    var test = msg.union(myRDD).reduceByKey((a,b)=>a+","+b).toDF()
+    var test = msg
+      .union(myRDD)
+      .reduceByKey((a,b)=>a+","+b)
+      .mapValues(_.split(",").toArray)
     
-    test.show()
+    test.collect().foreach(println)
 
+    var equipeA = 0
+    var equipeB = 0
 
+    graph.foreach{monster=>
+      if(monster._1.equipe == "A") equipeA+=1
+      else equipeB += 1
+    }
+
+    while(equipeA != 0 /*| equipeB != 0*/){
+        var idCurrent = 4
+
+        rddGraph.map{
+            monster =>
+                if(monster._1.id==idCurrent){
+
+                }
+        }
+        equipeA-=1
+    }
 
 }
