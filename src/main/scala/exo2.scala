@@ -25,6 +25,8 @@ object exo2 extends App {
     var testAttackProche = Sort("sword",false,List(35,30,25,20),50, 3, 6)
     var testAttackLoin = Sort("elbow",false,List(30, 25, 20),120, 2, 6)
 
+    var hit = Sort("hit",false,List(10),50, 3, 6)
+
     var listSort = List(testAttackLoin,testAttackProche)
 
     println(listSort)
@@ -32,11 +34,17 @@ object exo2 extends App {
     var teamA = new Team()
     var teamB = new Team()
 
-    var worgs1 = Monster(4,"Worgs Rider",  "B",33,20,List(null),  1)
-    var warlord = Monster(2,"Le Warlord", "B",33,20,List(null),  1)
-    var barbare = Monster(3,"Barbares Orc", "B",33,20,List(null), 1)
+    var worgs1 = Monster(4,"Worgs Rider",  "B",33,20,List(hit),  1)
+    var warlord = Monster(2,"Le Warlord", "B",33,20,List(hit),  1)
+    var barbare = Monster(3,"Barbares Orc", "B",33,20,List(hit), 1)
+
+    teamB.addMonster(worgs1)
+    teamB.addMonster(warlord)
+    teamB.addMonster(barbare)
 
     var solar = Monster(1,"Solar", "A",50,50,List(testAttackProche,testAttackLoin), 4)
+
+    teamA.addMonster(solar)
 
     var graph = Array((solar, Array(2,3,4)), (warlord, Array(1,4)), (barbare, Array(1,4)), (worgs1, Array(1,2,3)))
 
@@ -59,9 +67,6 @@ object exo2 extends App {
     var rddEdges = sc.makeRDD(edges).cache()
     var rddGraph = sc.makeRDD(graph).cache()
 
-
-
-
     println(rddGraph.collect()(0))
     println()
 
@@ -69,24 +74,31 @@ object exo2 extends App {
     import session.implicits._
     var dfGraph = rddGraph.toDF()
     var dfEdge = rddEdges.toDF()
-    dfGraph.show(200,false)
+    //dfGraph.show(200,false)
     dfEdge.show(200,false)
-    solar.Attack(warlord,testAttackProche)//OK
-    rddGraph.filter(monster => monster._1.HP>0)
+    //solar.Attack(warlord,testAttackProche)//OK
+    //rddGraph.filter(monster => monster._1.HP>0)
 
 
-    dfGraph.printSchema()
-    val process = dfEdge.map( row=> (row.getInt(2)))
-    process.show()
+    //dfGraph.printSchema()
+    //val process = dfEdge.map( row=> (row.getInt(2)))
+    //process.show()
 
 
 
     //OK retourne la distance entre deux monstre
     def findDistanceUsingDF(src: Monster, target: Monster): Int = {
+        dfEdge.show()
         val distance  = dfEdge.select($"distance").where($"Monster1"("name") === src.name and $"Monster2"("name") === target.name)
         val result :Int = distance.collect()(0).getInt(0)
         return result
     }
+
+    def findDistance(src: Monster, target: Monster): Int = {
+        var distance = rddEdges.filter(node => node.Monster1.name==src.name & node.Monster2.name == target.name).collect()(0).distance
+        distance
+    }
+
     /*
     def findDistance(src: Monster, target: Monster) {
 
@@ -108,6 +120,7 @@ object exo2 extends App {
     def SortChoice(monster: Monster, distance: Int):List[Sort]={
         var result = new Sort()
         var listSortResult = List.empty[Sort]
+
         for (i <- 0 until monster.listSort.length) {
             if(monster.listSort(i).distance >= distance) {
                 result = monster.listSort(i)
@@ -140,7 +153,7 @@ object exo2 extends App {
         val r = new Random()
         var rand = 1 + r.nextInt(19)
         var messageMonster = new ArrayBuffer[(Int,String)]()
-        val chosenSort = choice(monster,SortChoice(monster, findDistanceUsingDF(monster, target)))
+        val chosenSort = choice(monster,SortChoice(monster, findDistance(monster, target)))
         if(rand + chosenSort.listPower(monster.counterAtt) >= target.armure){
             messageMonster += Tuple2(monster.id,"test")
             monster.Attack(target,  chosenSort)
