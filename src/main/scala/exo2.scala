@@ -29,14 +29,16 @@ object exo2 extends App {
 
     println(listSort)
 
+    var teamA = new Team()
+    var teamB = new Team()
 
-    var worgs1 = Monster(1,"Worgs Rider",  "B",33,20,List(null),  1)
+    var worgs1 = Monster(4,"Worgs Rider",  "B",33,20,List(null),  1)
     var warlord = Monster(2,"Le Warlord", "B",33,20,List(null),  1)
     var barbare = Monster(3,"Barbares Orc", "B",33,20,List(null), 1)
 
-    var solar = Monster(4,"Solar", "A",50,50,List(testAttackProche,testAttackLoin), 4)
+    var solar = Monster(1,"Solar", "A",50,50,List(testAttackProche,testAttackLoin), 4)
 
-    var graph = Array((worgs1, Array(2,3,4)), (warlord, Array(1,4)), (barbare, Array(1,4)), (solar, Array(1,2,3,4)))
+    var graph = Array((solar, Array(2,3,4)), (warlord, Array(1,4)), (barbare, Array(1,4)), (worgs1, Array(1,2,3)))
 
     var edges = Array.empty[edge]
 
@@ -128,13 +130,13 @@ object exo2 extends App {
         val r = new Random()
         val rand = r.nextInt(100)
         val odd = monster.HP * 100 / monster.maxHP
-        if(odd + 20 < odd){
+        if(odd + 20 < rand){
             true
         }
         else false
     }
 
-    def attack(monster: Monster, target : Monster, edges : RDD[edge], msg : RDD[(Int, String)]): ArrayBuffer[(Int,String)] = {
+    def attack(monster: Monster, target : Monster, edges : RDD[edge]): ArrayBuffer[(Int,String)] = {
         val r = new Random()
         var rand = 1 + r.nextInt(19)
         var messageMonster = new ArrayBuffer[(Int,String)]()
@@ -175,15 +177,15 @@ object exo2 extends App {
     //println(findDistanceUsingDF(solar, warlord))
     //FindSorts_and_Attack(solar,warlord)
     //println(SortChoice(solar,findDistanceUsingDF(solar,warlord)))
-    var msg = sc.makeRDD(attack(solar, worgs1, rddEdges,myRDD))
-    var test = msg
-      .union(myRDD)
-      .reduceByKey((a,b)=>a+","+b)
-      .mapValues(_.split(",").toArray)
+    //var msg = sc.makeRDD(attack(solar, worgs1, rddEdges))
+    //var test = msg
+  //    .union(myRDD)
+  //    .reduceByKey((a,b)=>a+","+b)
+  //    .mapValues(_.split(",").toArray)
     
-    test.collect().foreach(println)
+  //  test.collect().foreach(println)
 
-    var equipeA = 0
+    /*var equipeA = 0
     var equipeB = 0
 
     graph.foreach{monster=>
@@ -201,6 +203,16 @@ object exo2 extends App {
                 }
         }
         equipeA-=1
+    }*/
+
+    var rdd = rddGraph.flatMap{
+        case(monster, adj) => {
+            adj.map{
+                x => attack(monster, rddGraph.collect()(x-1)._1, rddEdges)
+            }
+        }
     }
+
+    rdd.toDF().show()
 
 }
