@@ -1,3 +1,5 @@
+import scala.collection.mutable.ListBuffer
+
 case class Team(var monsters : List[Monster]) {
 
   def this(){
@@ -5,11 +7,16 @@ case class Team(var monsters : List[Monster]) {
   }
 
   def addMonster(monster : Monster) : Unit = {
-    this.monsters :+ monster
+    var buffer = new ListBuffer[Monster]()
+    this.monsters.foreach( x => buffer += x)
+    buffer += monster
+    this.monsters = buffer.toList
   }
 
   def dead(monster: Monster): Unit = {
-    this.monsters diff List(monster)
+    var buffer = this.monsters.toBuffer
+    buffer -= monster
+    this.monsters = buffer.toList
   }
 
   def hasLost(): Boolean ={

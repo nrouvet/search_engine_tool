@@ -41,6 +41,13 @@ object testNico extends App {
   teamB.addMonster(warlord)
   teamB.addMonster(barbare)
 
+  println("listMonstreTeamB")
+  println(teamB.monsters.size)
+
+  teamB.monsters.foreach(println)
+
+
+
   var solar = (Monster(1, "Solar", "A", 50, 50, List(testAttackProche, testAttackLoin), 4))
 
   teamA.addMonster(solar)
@@ -68,8 +75,8 @@ object testNico extends App {
   var rddEdges = sc.makeRDD(edges)
   var rddGraph = sc.makeRDD(graph)
 
-  println(rddGraph.collect()(0))
-  println()
+  //println(rddGraph.collect()(0))
+  //println()
 
   //print result pour test attack
 
@@ -249,16 +256,45 @@ object testNico extends App {
 
 
   println("test filter mort")
-  rddMessage.filter(f => f._2.contains("mort")).toDF().show()
+  var idMort =rddMessage.filter(f => f._2.contains("mort")).flatMap(monster => {
+    Array(monster._1.id)
+  }).collect()
+  idMort.foreach(println)
+
+
+  var index = 0
+  while(index < teamB.monsters.length) {
+    if(idMort.contains(teamB.monsters(index).id)){
+      teamB.dead(teamB.monsters(index))
+      index-=1
+    }
+    index+=1
+  }
+  index  =0
+
+  while(index < teamA.monsters.length) {
+    if(idMort.contains(teamA.monsters(index).id)){
+      teamA.dead(teamA.monsters(index))
+      index-=1
+    }
+    index+=1
+  }
+
+
+  println("listTeam B")
+  teamB.monsters.foreach(println)
+
+
+
   //rddGraph.toDF().show(truncate = false)
   //rddEdges.toDF().show(truncate = false)
 
-  println("test join ")
-  var contrib = rddGraph.leftOuterJoin(rddMessage).reduceByKey((a,b)=> (b._1,Option(a._2 +","+b._2)))
-  contrib.toDF().show(truncate = false)
+  println("test join rddGraph ")
+   var contrib = rddGraph.leftOuterJoin(rddMessage).reduceByKey((a,b)=> (b._1,Option(a._2 +","+b._2)))
+  .toDF().show(truncate = false)
 
-  println("Rdd without dead Monster")
-  var newRdd = contrib.filter(f=> !(f._2._2.contains("mort")))
+  //println("Rdd without dead Monster")
+  //var newRdd = .filter(f=> !(f._2._2.contains("mort"))).toDF().show()
 
   /*
   var newRdd2 = newRdd.flatMap(x => {
