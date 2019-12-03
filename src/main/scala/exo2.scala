@@ -131,7 +131,7 @@ object exo2 extends App {
     }
 
     def choice(monster: Monster, list : List[Sort]): Sort ={
-        if(list != null){
+        if(!list.isEmpty){
             val r = new Random()
             val rand = r.nextInt(list.size)
             return list(rand)
@@ -150,25 +150,28 @@ object exo2 extends App {
     }
 
     def attack(monster: Monster, target : Monster, edges : RDD[edge]): ArrayBuffer[(Int,String)] = {
+        var messageMonster = new ArrayBuffer[(Int,String)]()
+        if(monster.equipe != target.equipe){
         val r = new Random()
         var rand = 1 + r.nextInt(19)
-        var messageMonster = new ArrayBuffer[(Int,String)]()
         val chosenSort = choice(monster,SortChoice(monster, findDistance(monster, target)))
-        if(rand + chosenSort.listPower(monster.counterAtt) >= target.armure){
-            messageMonster += Tuple2(monster.id,"test")
+        if(chosenSort == null) messageMonster += Tuple2(monster.id, monster.name + " ne peut pas attaquer ! Il est trop loin de " + target.name + "!")
+        else if(rand == 20 | rand + chosenSort.listPower(monster.counterAtt) >= target.armure){
+            messageMonster += Tuple2(monster.id,monster.name + " attaque " + target.name)
+            messageMonster += Tuple2(monster.id,monster.name + " utilise " + chosenSort.toString)
             monster.Attack(target,  chosenSort)
             if(target.HP == 0){
-                messageMonster += Tuple2(target.id ,"dead")
+                messageMonster += Tuple2(target.id ,target.name + " est mort")
 
             }
             else{
                 messageMonster += Tuple2(target.id , target.HP.toString)
             }
-
-            print()
-
         }
+        else messageMonster += Tuple2(target.id, target.name + " a parré l'attque de " + monster.name)
         messageMonster.foreach(println)
+    }
+
         messageMonster
     }
 
@@ -218,6 +221,8 @@ object exo2 extends App {
         equipeA-=1
     }*/
 
+
+
     var rdd = rddGraph.flatMap{
         case(monster, adj) => {
             adj.map{
@@ -226,6 +231,6 @@ object exo2 extends App {
         }
     }
 
-    rdd.toDF().show()
+    rdd.toDF().show(truncate = false)
 
 }
