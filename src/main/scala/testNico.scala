@@ -254,10 +254,32 @@ object testNico extends App {
   //rddEdges.toDF().show(truncate = false)
 
   println("test join ")
-  var contrib = rddGraph.join(rddMessage)
+  var contrib = rddGraph.leftOuterJoin(rddMessage).reduceByKey((a,b)=> (b._1,Option(a._2 +","+b._2)))
   contrib.toDF().show(truncate = false)
 
-  var deroulement =
+  println("Rdd without dead Monster")
+  var newRdd = contrib.filter(f=> !(f._2._2.contains("mort")))
+
+  /*
+  var newRdd2 = newRdd.flatMap(x => {
+    var id = Array(x._1.id)
+    var idEdges = x._2._1
+    var test = Array[Int]()
+    idEdges.flatMap(y=>{
+      if(id.contains(y))
+        {
+          test :+ y
+        }
+      test
+    })
+  }).toDF().show(false)
+*/
+
+
+
+
+
+
 
   println("test")
 

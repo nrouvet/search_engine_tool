@@ -152,31 +152,33 @@ object exo2 extends App {
     }
 
     def attack(monster: Monster, target : Monster, edges : RDD[edge]): ArrayBuffer[(Int,String)] = {
-        var messageMonster = new ArrayBuffer[(Int,String)]()
-        if(monster.equipe != target.equipe){
+      var messageMonster = new ArrayBuffer[(Int, String)]()
+      if (monster.equipe != target.equipe) {
         val r = new Random()
         var rand = 1 + r.nextInt(19)
-        var messageMonster = new ArrayBuffer[(Int,String)]()
-        val chosenSort = choice(monster,SortChoice(monster, findDistance(monster, target)))
-        if(chosenSort == null) messageMonster += Tuple2(monster.id, monster.name + " ne peut pas attaquer ! Il est trop loin de " + target.name + "!")
-        else if(rand == 20 | rand + chosenSort.listPower(monster.counterAtt) >= target.armure){
-            messageMonster += Tuple2(monster.id,monster.name + " attaque " + target.name)
-            messageMonster += Tuple2(monster.id,monster.name + " utilise " + chosenSort.toString)
-            monster.Attack(target,  chosenSort)
-            if(target.HP == 0){
-                messageMonster += Tuple2(target.id ,"dead")
+        var messageMonster = new ArrayBuffer[(Int, String)]()
+        val chosenSort = choice(monster, SortChoice(monster, findDistance(monster, target)))
+        if (chosenSort == null) messageMonster += Tuple2(monster.id, monster.name + " ne peut pas attaquer ! Il est trop loin de " + target.name + "!")
+        else if (rand == 20 | rand + chosenSort.listPower(monster.counterAtt) >= target.armure) {
+          messageMonster += Tuple2(monster.id, monster.name + " attaque " + target.name)
+          messageMonster += Tuple2(monster.id, monster.name + " utilise " + chosenSort.toString)
+          monster.Attack(target, chosenSort)
+          if (target.HP == 0) {
+            messageMonster += Tuple2(target.id, "dead")
 
-            }
-            else{
-                messageMonster += Tuple2(target.id , target.HP.toString)
-            }
+          }
+          else {
+            messageMonster += Tuple2(target.id, target.HP.toString)
+          }
 
-            print()
+          print()
 
         }
         else messageMonster += Tuple2(target.id, target.name + " a parré l'attque de " + monster.name)
         messageMonster.foreach(println)
-        messageMonster
+
+      }
+      messageMonster
     }
 
     var myRDD = rddGraph.flatMap(monster => {
