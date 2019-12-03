@@ -227,6 +227,7 @@ object testNico extends App {
       case (monster, adj) => {
           adj.map {
               x => var message = attack(monster, rddGraph.collect()(x - 1)._1, rddEdges)
+              message
           }
       }
   }
