@@ -223,6 +223,7 @@ object crawler extends App {
   //sorts_json.write.json("data/")
 
 
+
   val nameSort = readLine("enter sort's name: ")
 
   val reseachrSort = df.select($"monsters").filter($"sort"===nameSort)

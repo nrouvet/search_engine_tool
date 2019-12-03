@@ -133,7 +133,7 @@ object exo2 extends App {
     }
 
     def choice(monster: Monster, list : List[Sort]): Sort ={
-        if(!list.isEmpty){
+        if(list != null){
             val r = new Random()
             val rand = r.nextInt(list.size)
             return list(rand)
