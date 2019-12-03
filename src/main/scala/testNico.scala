@@ -226,18 +226,20 @@ object testNico extends App {
   var rdd = rddGraph.flatMap {
       case (monster, adj) => {
           adj.map {
-              x => var message :+ attack(monster, rddGraph.collect()(x - 1)._1, rddEdges)
+              x => var message = attack(monster, rddGraph.collect()(x - 1)._1, rddEdges)
           }
       }
   }
 
+  println("test rdd message")
+  rdd.collect().foreach(println)
 
   /*
         .union(myRDD)
         .reduceByKey((a, b) => a + "," + b)
         .mapValues(_.split(",").toArray)*/
 
-  println(attack(solar,warlord,rddEdges))
+  //println(attack(solar,warlord,rddEdges))
 
 
   println("message")
@@ -250,8 +252,11 @@ object testNico extends App {
   //rddGraph.toDF().show(truncate = false)
   //rddEdges.toDF().show(truncate = false)
 
-  //var contrib = rddGraph.join(rddMessage)
-  //contrib.toDF().show(truncate = false)
+  println("test join ")
+  var contrib = rddGraph.join(rddMessage)
+  contrib.toDF().show(truncate = false)
+
+  var deroulement =
 
   println("test")
 
