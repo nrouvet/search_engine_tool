@@ -4,7 +4,7 @@ import org.apache.spark.rdd.{PairRDDFunctions, RDD}
 import org.apache.spark.{SparkConf, SparkContext}
 import org.apache.spark.sql.SparkSession
 
-import scala.collection.mutable.ArrayBuffer
+import scala.collection.mutable.{ArrayBuffer, ListBuffer}
 import scala.util.Random
 
 object testNico extends App {
@@ -320,10 +320,30 @@ object testNico extends App {
   }).toDF().show(false)
 */
 
+  var extract = contrib.map{
+    case(monster, tuple) => tuple
+  }
+      .map{
+        case(link, msg) => link
+      }.collect()
+
+  var tmp = rddGraph.collect()
+
+  def finalRDD(array: Array[Array[Int]], array2: Array[(Monster, Array[Int])]) : Array[(Monster, Array[Int])] = {
+    var t : ArrayBuffer[(Monster,Array[Int])] = ArrayBuffer()
+    for(i <- 0 until tmp.length){
+      t += Tuple2(tmp(i)._1, extract(i))
+    }
+    t.toArray
+  }
+
+var finl = sc.makeRDD(finalRDD(extract, tmp))
 
 
-
-
+  //rddGraph = finl.join(rddGraph)
+  println("bo")
+  //println(finl.collect())
+  finl.collect().foreach(println)
 
 
   println("test")
