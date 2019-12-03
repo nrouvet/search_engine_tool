@@ -49,6 +49,8 @@ object exo2 extends App {
     var graph = Array((solar, Array(2,3,4)), (warlord, Array(1,4)), (barbare, Array(1,4)), (worgs1, Array(1,2,3)))
 
     var edges = Array.empty[edge]
+  //var edges = Array((1,(solar, worgs, 50)), (2, (solar, warlord, 50)), (3, (solar, barbare, 110)),
+  //      (4, (worgs, warlord, 50)), (5, (warlord, barbare, 50)))
 
     for(i <- 0 until graph.length){
         for(j<-0 until graph(i)._2.length){
@@ -154,6 +156,7 @@ object exo2 extends App {
         if(monster.equipe != target.equipe){
         val r = new Random()
         var rand = 1 + r.nextInt(19)
+        var messageMonster = new ArrayBuffer[(Int,String)]()
         val chosenSort = choice(monster,SortChoice(monster, findDistance(monster, target)))
         if(chosenSort == null) messageMonster += Tuple2(monster.id, monster.name + " ne peut pas attaquer ! Il est trop loin de " + target.name + "!")
         else if(rand == 20 | rand + chosenSort.listPower(monster.counterAtt) >= target.armure){
@@ -161,17 +164,18 @@ object exo2 extends App {
             messageMonster += Tuple2(monster.id,monster.name + " utilise " + chosenSort.toString)
             monster.Attack(target,  chosenSort)
             if(target.HP == 0){
-                messageMonster += Tuple2(target.id ,target.name + " est mort")
+                messageMonster += Tuple2(target.id ,"dead")
 
             }
             else{
                 messageMonster += Tuple2(target.id , target.HP.toString)
             }
+
+            print()
+
         }
         else messageMonster += Tuple2(target.id, target.name + " a parré l'attque de " + monster.name)
         messageMonster.foreach(println)
-    }
-
         messageMonster
     }
 
@@ -220,8 +224,6 @@ object exo2 extends App {
         }
         equipeA-=1
     }*/
-
-
 
     var rdd = rddGraph.flatMap{
         case(monster, adj) => {
