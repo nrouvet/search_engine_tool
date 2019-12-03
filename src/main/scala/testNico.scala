@@ -290,8 +290,17 @@ object testNico extends App {
   //rddEdges.toDF().show(truncate = false)
 
   println("test join rddGraph ")
-   var contrib = rddGraph.leftOuterJoin(rddMessage).reduceByKey((a,b)=> (b._1,Option(a._2 +","+b._2)))
-  .toDF().show(truncate = false)
+
+
+
+
+    var contrib = rddGraph.leftOuterJoin(rddMessage).reduceByKey((a, b) => (b._1, Option(a._2 + "," + b._2)))
+    contrib.toDF().show(false)
+
+
+
+     //rddGraph.leftOuterJoin(contrib).toDF().show(false)
+
 
   //println("Rdd without dead Monster")
   //var newRdd = .filter(f=> !(f._2._2.contains("mort"))).toDF().show()
