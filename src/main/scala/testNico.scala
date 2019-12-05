@@ -28,7 +28,7 @@ object testNico extends App {
 
   var listSort = List(testAttackLoin, testAttackProche)
 
-  println(listSort)
+  //println(listSort)
 
   var teamA = new Team()
   var teamB = new Team()
@@ -41,10 +41,10 @@ object testNico extends App {
   teamB.addMonster(warlord)
   teamB.addMonster(barbare)
 
-  println("listMonstreTeamB")
-  println(teamB.monsters.size)
+  //println("listMonstreTeamB")
+  //println(teamB.monsters.size)
 
-  teamB.monsters.foreach(println)
+  //teamB.monsters.foreach(println)
 
 
 
@@ -85,7 +85,7 @@ object testNico extends App {
   var dfGraph = rddGraph.toDF()
   var dfEdge = rddEdges.toDF()
   //dfGraph.show(200,false)
-  dfEdge.show(200, false)
+  //dfEdge.show(200, false)
   //solar.Attack(warlord,testAttackProche)//OK
   //rddGraph.filter(monster => monster._1.HP>0)
 
@@ -187,7 +187,7 @@ object testNico extends App {
     messageMonster
   })
   println("message")
-  myRDD.toDF().show()
+  //myRDD.toDF().show()
 
   /*
   myRDD.map(monster => {
@@ -239,8 +239,8 @@ object testNico extends App {
       }
   }
 
-  println("test rdd message")
-  rdd.collect().foreach(println)
+  //println("test rdd message")
+  //rdd.collect().foreach(println)
 
   /*
         .union(myRDD)
@@ -250,16 +250,16 @@ object testNico extends App {
   //println(attack(solar,warlord,rddEdges))
 
 
-  println("message")
+  //println("message")
   var rddMessage = sc.makeRDD(attack(solar,warlord,rddEdges))
-  rddMessage.toDF().show(truncate =false)
+  //rddMessage.toDF().show(truncate =false)
 
 
-  println("test filter mort")
+  //println("test filter mort")
   var idMort =rddMessage.filter(f => f._2.contains("mort")).flatMap(monster => {
     Array(monster._1.id)
   }).collect()
-  idMort.foreach(println)
+  //idMort.foreach(println)
 
 
   var index = 0
@@ -281,21 +281,21 @@ object testNico extends App {
   }
 
 
-  println("listTeam B")
-  teamB.monsters.foreach(println)
+  //println("listTeam B")
+  //teamB.monsters.foreach(println)
 
 
 
   //rddGraph.toDF().show(truncate = false)
   //rddEdges.toDF().show(truncate = false)
 
-  println("test join rddGraph ")
+ // println("test join rddGraph ")
 
 
 
 
     var contrib = rddGraph.leftOuterJoin(rddMessage).reduceByKey((a, b) => (b._1, Option(a._2 + "," + b._2)))
-    contrib.toDF().show(false)
+    //contrib.toDF().show(false)
 
 
 
@@ -328,23 +328,26 @@ object testNico extends App {
       }.collect()
 
   var tmp = rddGraph.collect()
+  //tmp = sc.makeRDD(tmp)
+
+
 
   def finalRDD(array: Array[Array[Int]], array2: Array[(Monster, Array[Int])]) : Array[(Monster, Array[Int])] = {
     var t : ArrayBuffer[(Monster,Array[Int])] = ArrayBuffer()
-    for(i <- 0 until tmp.length){
-      t += Tuple2(tmp(i)._1, extract(i))
+    for(i <- 0 until array.length){
+      t += Tuple2(array2(i)._1, array(i))
     }
     t.toArray
   }
 
 var finl = sc.makeRDD(finalRDD(extract, tmp))
 
-
-  //rddGraph = finl.join(rddGraph)
-  println("bo")
+  rddGraph = finl
+  //rddGraph = rddGraph.join(finl)
   //println(finl.collect())
   finl.collect().foreach(println)
-
+  println("bo")
+  rddGraph.collect().foreach(println)
 
   println("test")
 
