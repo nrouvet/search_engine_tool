@@ -230,14 +230,14 @@ object testNico extends App {
 
 
 
-  var rdd = rddGraph.flatMap {
+  var rddMessageTest = rddGraph.flatMap {
       case (monster, adj) => {
-          adj.map {
+          adj.flatMap{
               x => var message = attack(monster, rddGraph.collect()(x - 1)._1, rddEdges)
               message
           }
       }
-  }
+  }.keyBy(key => key._1.id)
 
   //println("test rdd message")
   //rdd.collect().foreach(println)
@@ -292,10 +292,11 @@ object testNico extends App {
  // println("test join rddGraph ")
 
 
+  var newRddGraph = rddGraph.keyBy(key=>key._1.id)
 
-
-    var contrib = rddGraph.leftOuterJoin(rddMessage).reduceByKey((a, b) => (b._1, Option(a._2 + "," + b._2)))
-    //contrib.toDF().show(false)
+    var contrib = newRddGraph.leftOuterJoin(rddMessageTest)
+  println("contrib")
+  contrib.toDF().show(false)
 
 
 
@@ -319,7 +320,7 @@ object testNico extends App {
     })
   }).toDF().show(false)
 */
-
+/*
   var extract = contrib.map{
     case(monster, tuple) => tuple
   }
@@ -352,5 +353,5 @@ var finl = sc.makeRDD(finalRDD(extract, tmp))
   println("test")
 
 
-
+*/
 }
