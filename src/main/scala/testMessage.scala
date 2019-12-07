@@ -30,9 +30,9 @@ object testMessage extends App {
   var teamA = new Team()
   var teamB = new Team()
 
-  var worgs1 = (Monster(4, "Worgs Rider", "B", 33, 20, List(hit), 1))
-  var warlord = (Monster(2, "Le Warlord", "B", 33, 20, List(hit), 1))
-  var barbare = (Monster(3, "Barbares Orc", "B", 33, 20, List(hit), 1))
+  var worgs1 = (Monster(4, "Worgs Rider", "B", 33,150, List(hit), 1))
+  var warlord = (Monster(2, "Le Warlord", "B", 33, 150, List(hit), 1))
+  var barbare = (Monster(3, "Barbares Orc", "B", 33, 150, List(hit), 1))
 
   teamB.addMonster(worgs1)
   teamB.addMonster(warlord)
@@ -48,6 +48,12 @@ object testMessage extends App {
   var solar = (Monster(1, "Solar", "A", 50, 50, List(testAttackProche, testAttackLoin), 4))
 
   teamA.addMonster(solar)
+
+  println("Monstre au début de la partie")
+  println("EquipeA")
+  teamA.monsters.foreach(println)
+  println("EquipeB")
+  teamB.monsters.foreach(println)
 
   var graph = Array((1, (solar, Array(2, 3, 4))), (2,(warlord, Array(1, 4))), (3, (barbare, Array(1, 4))), (4,(worgs1, Array(1, 2, 3))))
 
@@ -235,24 +241,46 @@ object testMessage extends App {
   }*/
 
 
-
-
-  var rddMessageTest = rddGraph.flatMap {
-    case (_, monster) => {
-      monster._2.flatMap{
-        x => var message = attack(monster._1, rddGraph.collect()(x - 1)._2._1, rddEdges, rddGraph.collect()(x - 1)._2._2)
-          Array(message)
+  var i = 1
+  while(teamA.monsters.size + teamB.monsters.size > 1){
+    println(teamA.monsters.size)
+    println(teamB.monsters.size)
+    var rddMessageTest = rddGraph.flatMap {
+      case (_, monster) => {
+        monster._2.flatMap {
+          x =>
+            var message = attack(monster._1, rddGraph.collect()(x - 1)._2._1, rddEdges, rddGraph.collect()(x - 1)._2._2)
+            Array(message)
+        }
       }
-    }
-  }.reduceByKey( (a,b)=> if(a._1.HP < b._1.HP) a else b)
+    }.reduceByKey((a, b) => if (a._1.HP < b._1.HP) a else b)
 
-  rddMessageTest.toDF().show(false)
+    rddMessageTest.toDF().show(false)
 
-  rddGraph.toDF().show(false)
+    //rddGraph.toDF().show(false)
 
-  var t = rddGraph.union(rddMessageTest)
-    .reduceByKey((a,b) => if(a._1.HP < b._1.HP) a else b)
-    .toDF().show(false)
+     rddGraph = rddGraph.union(rddMessageTest)
+      .reduceByKey((a, b) => if (a._1.HP < b._1.HP) a else b)
+
+    rddGraph.collect().foreach(println)
+    var idMort = rddMessageTest.filter(f=> f._2._1.HP == 0).flatMap(monster => {
+      Array(monster._2._1.id)
+    }).collect()
+
+    println("tour: "+ i)
+    removeTeam(teamA, idMort)
+    removeTeam(teamB, idMort)
+
+    println("equipe")
+    println("monstre dans chaque équipe après "+i+" tour")
+    teamB.monsters.foreach(println)
+    teamA.monsters.foreach(println)
+
+    i += 1
+  }
+
+
+
 
   //println("test rdd message")
   //rdd.collect().foreach(println)
@@ -268,8 +296,8 @@ object testMessage extends App {
   //println("message")
   //var rddMessage = sc.makeRDD(attack(solar,warlord,rddEdges))
   //rddMessage.toDF().show(truncate =false)
-
 /*
+
   //println("test filter mort")
   var idMort = rddMessageTest.filter(f => f._2.contains("mort")).flatMap(monster => {
     Array(monster._1)
@@ -281,8 +309,8 @@ object testMessage extends App {
   }).collect()
 
   newRdd.foreach(println)
-
-  def removeTeam(team : Team, monster : Array[Monster]) : Unit ={
+*/
+  def removeTeam(team : Team, monster : Array[Int]) : Unit ={
     var index = 0
     while(index < team.monsters.length) {
       if(monster.contains(team.monsters(index).id)){
@@ -294,8 +322,8 @@ object testMessage extends App {
     index  =0
   }
 
-  removeTeam(teamA, idMort)
-  removeTeam(teamB, idMort)
+  //removeTeam(teamA, idMort)
+  //removeTeam(teamB, idMort)
 
   /*
     var index = 0
@@ -391,5 +419,5 @@ object testMessage extends App {
     println("test")
 
 */
-  */
+
 }

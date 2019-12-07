@@ -25,8 +25,8 @@ case class Monster(var id : Int, var name : String, var equipe : String, var arm
     if(sort.typeSort == false){
       target.Damage(sort.listPower(counterAtt) + rand)
     }
-    else
-      target.Heal(sort.listPower(counterAtt) + rand)
+    //else
+      //target.Heal(sort.listPower(counterAtt) + rand)
   }
 
 
