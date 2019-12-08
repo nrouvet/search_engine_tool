@@ -9,6 +9,7 @@ object testMessage extends App {
   val conf = new SparkConf()
     .setAppName("BDDExo2")
     .setMaster("local[*]")
+
   val sc = new SparkContext(conf)
   sc.setLogLevel("ERROR")
 
@@ -68,10 +69,10 @@ object testMessage extends App {
   println("EquipeB")
   teamB.monsters.foreach(println)
 
-  var graph = Array((1, (solar, Array(2, 3, 4, 5, 6, 7/*, 8, 9, 10*/))), (2,(warlord, Array(1, 4))), (3, (barbare, Array(1, 4))), (4,(worgs1, Array(1, 2, 3))), (5, (barbare2, Array(1, 4))),
-    (6, (barbare3, Array(1, 5))),
-    (7, (barbare4, Array(1, 6)))
-    /*(8, (barbare5, Array(1, 2,3,4,5,6,7))),
+  var graph = Array((1, (solar, Array(2, 3, 4, 5, 6, 7/*, 8, 9, 10*/))), (2,(warlord, Array(1))), (3, (barbare, Array(1))), (4,(worgs1, Array(1))), (5, (barbare2, Array(1))),
+    (6, (barbare3, Array(1))),
+    (7, (barbare4, Array(1)))/*,
+    (8, (barbare5, Array(1, 2,3,4,5,6,7))),
     (9, (barbare6, Array(1, 8))),
     (10, (barbare7, Array(1, 9)))*/
   )
@@ -83,11 +84,11 @@ object testMessage extends App {
   for (i <- 0 until graph.length) {
     for (j <- 0 until graph(i)._2._2.length) {
       if (graph(graph(i)._2._2(j) - 1)._2._1.equipe == graph(i)._2._1.equipe) {
-        var tmp = edge(graph(i)._2._1, graph(graph(i)._2._2(j) - 1)._2._1, 50)
+        var tmp = edge(graph(i)._2._1, graph(graph(i)._2._2(j) - 1)._2._1, 20)
         edges = edges :+ tmp
       }
       else {
-        var tmp = edge(graph(i)._2._1, graph(graph(i)._2._2(j) - 1)._2._1, 110)
+        var tmp = edge(graph(i)._2._1, graph(graph(i)._2._2(j) - 1)._2._1, 40)
         edges = edges :+ tmp
       }
     }
@@ -170,14 +171,15 @@ object testMessage extends App {
     null
   }
 
-  def attackOrRegen(monster: Monster): Boolean = {
+  def choice(monster: Monster, target: Monster, edges: RDD[edge], number : Array[Int]): (Int, (Monster, Array[Int])) = {
     val r = new Random()
     val rand = r.nextInt(100)
     val odd = monster.HP * 100 / monster.maxHP
-    if (odd + 20 < rand) {
-      true
+    if (odd + 20 < rand && monster.id == 1 && monster.HP != monster.maxHP) {
+      monster.Heal(15)
+      Tuple2(monster.id, (monster,number))
     }
-    else false
+    else attack(monster, target, edges, number)
   }
 
   def attack(monster: Monster, target: Monster, edges: RDD[edge], number : Array[Int]): (Int, (Monster, Array[Int])) = {
@@ -191,24 +193,27 @@ object testMessage extends App {
         //messageMonster += Tuple2(monster, monster.name + " ne peut pas attaquer ! Il est trop loin de " + target.name + "!")
         println(monster.name + " ne peut pas attaquer ! Il est trop loin de " + target.name + "!")
       }
-      else if (rand + chosenSort.listPower(monster.counterAtt) >= target.armure) {
+      else if (rand + chosenSort.listPower(monster.counterAtt) >= target.armure || rand==20) {
         //messageMonster += Tuple2(monster, " attaque ")
         //messageMonster += Tuple2(monster, " utilise " + chosenSort.name)
         //println(monster.name + " attaque ")
         //println(monster.name + " utilise " + chosenSort.name)
         monster.Attack(target, chosenSort)
+        println(monster.name + " utilise " + chosenSort.name + " sur " + target.name+target.id)
         if (target.HP == 0) {
           //messageMonster += Tuple2(target, "mort")
-
+          println(target.name + target.id + " est mort !")
         }
         else {
           //messageMonster += Tuple2(target, target.HP.toString)
         }
       }
       //else messageMonster += Tuple2(target, target.name + " a parré l'attque de " + monster.name)
+      println(target.name+target.id + " a parré l'attque de " + monster.name+monster.id)
     }
     //messageMonster.foreach(println)
     //messageMonster
+    if(target.id==1 && target.HP != 0) target.Heal(15);
     Tuple2(target.id, (target,number))
   }
 
@@ -284,16 +289,17 @@ object testMessage extends App {
             Array(message)
         }
       }
-    }.reduceByKey((a, b) => if (a._1.HP < b._1.HP) a else b)
+    }.reduceByKey((a, b) => if (a._1.HP != b._1.HP) b else a)
+
 
     rddMessageTest.toDF().show(false)
 
     //rddGraph.toDF().show(false)
 
      rddGraph = rddGraph.union(rddMessageTest)
-      .reduceByKey((a, b) => if (a._1.HP < b._1.HP) a else b)
+      .reduceByKey((a, b) => if (a._1.HP != b._1.HP) b else a)
 
-    rddGraph.collect().foreach(println)
+    //rddGraph.collect().foreach(println)
     var idMort = rddMessageTest.filter(f=> f._2._1.HP == 0).flatMap(monster => {
       Array(monster._2._1.id)
     }).collect()
@@ -306,12 +312,20 @@ object testMessage extends App {
     println("monstre dans chaque équipe après "+i+" tour")
     teamB.monsters.foreach(x => println(x.name))
     teamA.monsters.foreach(x => println(x.name))
-
+    println("****************")
 
     i += 1
   }
 
+  if(teamA.hasLost()){
+    println("L'équipe A a perdu. Il reste dans l'équipe B:")
+    teamB.monsters.foreach(x => println(x.name))
+  }
 
+  if(teamB.hasLost()){
+    println("L'équipe B a perdu. Il reste dans l'équipe B:")
+    teamA.monsters.foreach(x => println(x.name))
+  }
 
 
   //println("test rdd message")
