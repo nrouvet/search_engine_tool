@@ -20,8 +20,8 @@ case class Team(var monsters : List[Monster]) {
   }
 
   def hasLost(): Boolean ={
-    if(this.monsters.isEmpty) return true
-     false
+    if(monsters.isEmpty) true
+    else false
   }
 
 }

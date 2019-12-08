@@ -30,13 +30,26 @@ object testMessage extends App {
   var teamA = new Team()
   var teamB = new Team()
 
-  var worgs1 = (Monster(4, "Worgs Rider", "B", 33,150, List(hit), 1))
-  var warlord = (Monster(2, "Le Warlord", "B", 33, 150, List(hit), 1))
-  var barbare = (Monster(3, "Barbares Orc", "B", 33, 150, List(hit), 1))
+  var worgs1 = Monster(4, "Worgs Rider", "B", 33,150, List(hit), 1)
+  var warlord = Monster(2, "Le Warlord", "B", 33, 150, List(hit), 1)
+  var barbare = Monster(3, "Barbares Orc", "B", 33, 150, List(hit), 1)
+  var barbare2 = Monster(5, "Barbares Orc", "B", 33, 150, List(hit), 1)
+  var barbare3 = Monster(6, "Barbares Orc", "B", 33, 150, List(hit), 1)
+  var barbare4 = Monster(7, "Barbares Orc", "B", 33, 150, List(hit), 1)
+  /*var barbare5 = Monster(8, "Barbares Orc", "B", 33, 150, List(hit), 1)
+  var barbare6 = Monster(9, "Barbares Orc", "B", 33, 150, List(hit), 1)
+  var barbare7 = Monster(10, "Barbares Orc", "B", 33, 150, List(hit), 1)*/
+
 
   teamB.addMonster(worgs1)
   teamB.addMonster(warlord)
   teamB.addMonster(barbare)
+  teamB.addMonster(barbare2)
+  teamB.addMonster(barbare3)
+  teamB.addMonster(barbare4)
+  /*teamB.addMonster(barbare5)
+  teamB.addMonster(barbare6)
+  teamB.addMonster(barbare7)*/
 
   //println("listMonstreTeamB")
   //println(teamB.monsters.size)
@@ -45,7 +58,7 @@ object testMessage extends App {
 
 
 
-  var solar = (Monster(1, "Solar", "A", 50, 50, List(testAttackProche, testAttackLoin), 4))
+  var solar = Monster(1, "Solar", "A", 50, 50, List(testAttackProche, testAttackLoin), 4)
 
   teamA.addMonster(solar)
 
@@ -55,7 +68,13 @@ object testMessage extends App {
   println("EquipeB")
   teamB.monsters.foreach(println)
 
-  var graph = Array((1, (solar, Array(2, 3, 4))), (2,(warlord, Array(1, 4))), (3, (barbare, Array(1, 4))), (4,(worgs1, Array(1, 2, 3))))
+  var graph = Array((1, (solar, Array(2, 3, 4, 5, 6, 7/*, 8, 9, 10*/))), (2,(warlord, Array(1, 4))), (3, (barbare, Array(1, 4))), (4,(worgs1, Array(1, 2, 3))), (5, (barbare2, Array(1, 4))),
+    (6, (barbare3, Array(1, 5))),
+    (7, (barbare4, Array(1, 6)))
+    /*(8, (barbare5, Array(1, 2,3,4,5,6,7))),
+    (9, (barbare6, Array(1, 8))),
+    (10, (barbare7, Array(1, 9)))*/
+  )
 
   var edges = Array.empty[edge]
   //var edges = Array((1,(solar, worgs, 50)), (2, (solar, warlord, 50)), (3, (solar, barbare, 110)),
@@ -240,9 +259,21 @@ object testMessage extends App {
       equipeA-=1
   }*/
 
+  def removeTeam(team : Team, monster : Array[Int]) : Unit ={
+    var index = 0
+    while(index < team.monsters.length) {
+      if(monster.contains(team.monsters(index).id)){
+        team.dead(team.monsters(index))
+        index-=1
+      }
+      index+=1
+    }
+    index  =0
+  }
+
 
   var i = 1
-  while(teamA.monsters.size + teamB.monsters.size > 1){
+  while(!teamB.hasLost() && !teamA.hasLost()){
     println(teamA.monsters.size)
     println(teamB.monsters.size)
     var rddMessageTest = rddGraph.flatMap {
@@ -273,8 +304,9 @@ object testMessage extends App {
 
     println("equipe")
     println("monstre dans chaque équipe après "+i+" tour")
-    teamB.monsters.foreach(println)
-    teamA.monsters.foreach(println)
+    teamB.monsters.foreach(x => println(x.name))
+    teamA.monsters.foreach(x => println(x.name))
+
 
     i += 1
   }
@@ -310,17 +342,7 @@ object testMessage extends App {
 
   newRdd.foreach(println)
 */
-  def removeTeam(team : Team, monster : Array[Int]) : Unit ={
-    var index = 0
-    while(index < team.monsters.length) {
-      if(monster.contains(team.monsters(index).id)){
-        team.dead(team.monsters(index))
-        index-=1
-      }
-      index+=1
-    }
-    index  =0
-  }
+
 
   //removeTeam(teamA, idMort)
   //removeTeam(teamB, idMort)
