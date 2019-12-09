@@ -8,7 +8,7 @@ import scala.util.Random
 object testMessage extends App {
   val conf = new SparkConf()
     .setAppName("BDDExo2")
-    .setMaster("local[*]")
+    .setMaster("local[8]")
 
   val sc = new SparkContext(conf)
   sc.setLogLevel("ERROR")
@@ -31,15 +31,15 @@ object testMessage extends App {
   var teamA = new Team()
   var teamB = new Team()
 
-  var worgs1 = Monster(4, "Worgs Rider", "B", 33,150, List(hit), 1)
-  var warlord = Monster(2, "Le Warlord", "B", 33, 150, List(hit), 1)
-  var barbare = Monster(3, "Barbares Orc", "B", 33, 150, List(hit), 1)
-  var barbare2 = Monster(5, "Barbares Orc", "B", 33, 150, List(hit), 1)
-  var barbare3 = Monster(6, "Barbares Orc", "B", 33, 150, List(hit), 1)
-  var barbare4 = Monster(7, "Barbares Orc", "B", 33, 150, List(hit), 1)
-  /*var barbare5 = Monster(8, "Barbares Orc", "B", 33, 150, List(hit), 1)
-  var barbare6 = Monster(9, "Barbares Orc", "B", 33, 150, List(hit), 1)
-  var barbare7 = Monster(10, "Barbares Orc", "B", 33, 150, List(hit), 1)*/
+  var worgs1 = Monster(4, "Worgs Rider", "B", 33,50, List(hit), 1)
+  var warlord = Monster(2, "Le Warlord", "B", 33, 30, List(hit), 1)
+  var barbare = Monster(3, "Barbares Orc", "B", 33, 30, List(hit), 1)
+  var barbare2 = Monster(5, "Barbares Orc", "B", 33, 50, List(hit), 1)
+  var barbare3 = Monster(6, "Barbares Orc", "B", 33, 30, List(hit), 1)
+  var barbare4 = Monster(7, "Barbares Orc", "B", 33, 30, List(hit), 1)
+  var barbare5 = Monster(8, "Barbares Orc", "B", 33, 50, List(hit), 1)
+  var barbare6 = Monster(9, "Barbares Orc", "B", 33, 30, List(hit), 1)
+  var barbare7 = Monster(10, "Barbares Orc", "B", 33, 30, List(hit), 1)
 
 
   teamB.addMonster(worgs1)
@@ -48,9 +48,9 @@ object testMessage extends App {
   teamB.addMonster(barbare2)
   teamB.addMonster(barbare3)
   teamB.addMonster(barbare4)
-  /*teamB.addMonster(barbare5)
+  teamB.addMonster(barbare5)
   teamB.addMonster(barbare6)
-  teamB.addMonster(barbare7)*/
+  teamB.addMonster(barbare7)
 
   //println("listMonstreTeamB")
   //println(teamB.monsters.size)
@@ -64,17 +64,18 @@ object testMessage extends App {
   teamA.addMonster(solar)
 
   println("Monstre au début de la partie")
+  println("************************")
   println("EquipeA")
-  teamA.monsters.foreach(println)
+  teamA.monsters.foreach(x => println(x.name))
   println("EquipeB")
-  teamB.monsters.foreach(println)
+  teamB.monsters.foreach(x => println(x.name))
 
-  var graph = Array((1, (solar, Array(2, 3, 4, 5, 6, 7/*, 8, 9, 10*/))), (2,(warlord, Array(1))), (3, (barbare, Array(1))), (4,(worgs1, Array(1))), (5, (barbare2, Array(1))),
+  var graph = Array((1, (solar, Array(2, 3, 4, 5, 6, 7, 8, 9, 10))), (2,(warlord, Array(1))), (3, (barbare, Array(1))), (4,(worgs1, Array(1))), (5, (barbare2, Array(1))),
     (6, (barbare3, Array(1))),
-    (7, (barbare4, Array(1)))/*,
+    (7, (barbare4, Array(1))),
     (8, (barbare5, Array(1, 2,3,4,5,6,7))),
     (9, (barbare6, Array(1, 8))),
-    (10, (barbare7, Array(1, 9)))*/
+    (10, (barbare7, Array(1, 9)))
   )
 
   var edges = Array.empty[edge]
@@ -96,8 +97,9 @@ object testMessage extends App {
 
 
   var rddEdges = sc.makeRDD(edges)
-  var rddGraph = sc.makeRDD(graph)
+  var rddGraph = sc.makeRDD(graph).persist()
 
+  //rddGraph.distinct().collect().foreach(println)
   //println(rddGraph.collect()(0))
   //println()
 
@@ -222,7 +224,8 @@ object testMessage extends App {
     messageMonster :+ Tuple2(Monster, null)
     messageMonster
   })
-  println("message")
+  println("début du combat ")
+  println("*****************")
   //myRDD.toDF().show()
 
   /*
@@ -289,7 +292,8 @@ object testMessage extends App {
             Array(message)
         }
       }
-    }.reduceByKey((a, b) => if (a._1.HP != b._1.HP) b else a)
+    }.persist()
+    rddMessageTest.reduceByKey((a, b) => if (a._1.HP != b._1.HP) b else a).persist()
 
 
     rddMessageTest.toDF().show(false)
