@@ -32,37 +32,37 @@ object testBroadcast extends App{
   var teamA = new Team()
   var teamB = new Team()
 
-  var worgs1 = Monster(4, "Worgs Rider", "B", 33,50, List(hit), 1)
-  var warlord = Monster(2, "Le Warlord", "B", 33, 33, List(hit), 1)
-  var barbare = Monster(3, "Barbares Orc", "B", 33, 33, List(hit), 1)
-  var barbare2 = Monster(5, "Barbares Orc", "B", 33, 33, List(hit), 1)
-  var barbare3 = Monster(6, "Barbares Orc", "B", 33, 33, List(hit), 1)
-  var barbare4 = Monster(7, "Barbares Orc", "B", 33, 33, List(hit), 1)
-  var barbare5 = Monster(8, "Barbares Orc", "B", 33, 33, List(hit), 1)
-  /*var barbare6 = Monster(9, "Barbares Orc", "B", 33, 33, List(hit), 1)
-  var barbare7 = Monster(10, "Barbares Orc", "B", 33, 33, List(hit), 1)
-  var barbare8 = Monster(11, "Barbares Orc", "B", 33, 33, List(hit), 1)
-  var barbare9 = Monster(12, "Barbares Orc", "B", 33, 33, List(hit), 1)
-  var barbare10 = Monster(13, "Barbares Orc", "B", 33, 33, List(hit), 1)
-  var barbare11 = Monster(14, "Barbares Orc", "B", 33, 33, List(hit), 1)
-  var barbare12 = Monster(15, "Barbares Orc", "B", 33, 33, List(hit), 1)
-  var barbare13 = Monster(16, "Barbares Orc", "B", 33, 33, List(hit), 1)*/
 
-  teamB.addMonster(worgs1)
+  var warlord = Monster(2, "Le Warlord", "B", 33, 33, List(hit), 1)
+  var barbare1 = Monster(3, "Barbares Orc1", "B", 33, 33, List(hit), 1)
+  var barbare2 = Monster(4, "Barbares Orc2", "B", 33, 33, List(hit), 1)
+  var barbare3 = Monster(5, "Barbares Orc3", "B", 33, 33, List(hit), 1)
+  var barbare4 = Monster(6, "Barbares Orc4", "B", 33, 33, List(hit), 1)
+  var worgs1 = Monster(7, "Worgs Rider1", "B", 33,50, List(hit), 1)
+  var worgs2 = Monster(8, "Worgs Rider2", "B", 33, 33, List(hit), 1)
+  var worgs3 = Monster(9, "Worgs Rider3", "B", 33, 33, List(hit), 1)
+  var worgs4 = Monster(10, "Worgs Rider4", "B", 33, 33, List(hit), 1)
+  var worgs5 = Monster(11, "Worgs Rider5", "B", 33, 33, List(hit), 1)
+  /*var worgs6 = Monster(12, "Worgs Rider6", "B", 33, 33, List(hit), 1)
+  var worgs7 = Monster(13, "Worgs Rider7", "B", 33, 33, List(hit), 1)
+  var worgs8 = Monster(14, "Worgs Rider8", "B", 33, 33, List(hit), 1)
+  var worgs9 = Monster(15, "Worgs Rider9", "B", 33, 33, List(hit), 1)*/
+
+
   teamB.addMonster(warlord)
-  teamB.addMonster(barbare)
+  teamB.addMonster(barbare1)
   teamB.addMonster(barbare2)
   teamB.addMonster(barbare3)
   teamB.addMonster(barbare4)
-  teamB.addMonster(barbare5)
-  /*teamB.addMonster(barbare6)
-  teamB.addMonster(barbare7)
-  teamB.addMonster(barbare8)
-  teamB.addMonster(barbare9)
-  teamB.addMonster(barbare10)
-  teamB.addMonster(barbare11)
-  teamB.addMonster(barbare12)
-  teamB.addMonster(barbare13)*/
+  teamB.addMonster(worgs1)
+  teamB.addMonster(worgs2)
+  teamB.addMonster(worgs3)
+  teamB.addMonster(worgs4)
+  teamB.addMonster(worgs5)
+  /*teamB.addMonster(worgs6)
+  teamB.addMonster(worgs7)
+  teamB.addMonster(worgs8)
+  teamB.addMonster(worgs9)*/
 
   //println("listMonstreTeamB")
   //println(teamB.monsters.size)
@@ -75,29 +75,29 @@ object testBroadcast extends App{
 
   teamA.addMonster(solar)
 
-  println("Monstre au début de la partie")
+  //println("Monstre au début de la partie")
+  println("Début de la partie")
   println("************************")
-  println("EquipeA")
-  teamA.monsters.foreach(x => println(x.name))
-  println("EquipeB")
-  teamB.monsters.foreach(x => println(x.name))
+  //println("EquipeA")
+  //teamA.monsters.foreach(x => println(x.name))
+  //println("EquipeB")
+  //teamB.monsters.foreach(x => println(x.name))
 
-  var graph: Array[(Int, (Monster, Array[Int]))] = Array((1, (solar, Array(2, 3, 4, 5, 6, 7, 8/*, 9, 10, 11, 12, 13, 14, 15, 16*/))),
+  var graph: Array[(Int, (Monster, Array[Int]))] = Array((1, (solar, Array(2, 3, 4, 5, 6, 7, 8, 9, 10, 11/*, 12, 13, 14, 15*/))),
     (2,(warlord, Array(1))),
-    (3, (barbare, Array(1))),
-    (4,(worgs1, Array(1))),
-    (5, (barbare2, Array(1))),
-    (6, (barbare3, Array(1))),
-    (7, (barbare4, Array(1))),
-    (8, (barbare5, Array(1)))/*,
-    (9, (barbare6, Array(1))),
-    (10, (barbare7, Array(1))),
-    (11, (barbare8, Array(1))),
-    (12, (barbare9, Array(1))),
-    (13, (barbare10, Array(1))),
-    (14, (barbare11, Array(1))),
-    (15, (barbare12, Array(1))),
-    (16, (barbare13, Array(1)))*/
+    (3, (barbare1, Array(1))),
+    (4, (barbare2, Array(1))),
+    (5, (barbare3, Array(1))),
+    (6, (barbare4, Array(1))),
+    (7,(worgs1, Array(1))),
+    (8, (worgs2, Array(1))),
+    (9, (worgs3, Array(1))),
+    (10, (worgs4, Array(1))),
+    (11, (worgs5, Array(1)))/*,
+    (12, (worgs6, Array(1))),
+    (13, (worgs7, Array(1))),
+    (14, (worgs8, Array(1))),
+    (15, (worgs9, Array(1)))*/
   )
 
   var broad = sc.broadcast(graph)
@@ -125,57 +125,17 @@ object testBroadcast extends App{
   var rddEdges = sc.makeRDD(edges)
   var rddGraph = sc.makeRDD(graph)
 
-  //rddGraph.distinct().collect().foreach(println)
-  //println(rddGraph.collect()(0))
-  //println()
-
-  //print result pour test attack
-
   import session.implicits._
 
   var dfGraph = rddGraph.toDF()
   var dfEdge = rddEdges.toDF()
-  //dfGraph.show(200,false)
-  //dfEdge.show(200, false)
-  //solar.Attack(warlord,testAttackProche)//OK
-  //rddGraph.filter(monster => monster._1.HP>0)
 
-
-  //dfGraph.printSchema()
-  //val process = dfEdge.map( row=> (row.getInt(2)))
-  //process.show()
-
-
-  //OK retourne la distance entre deux monstre
-  def findDistanceUsingDF(src: Monster, target: Monster): Int = {
-    dfEdge.show()
-    val distance = dfEdge.select($"distance").where($"Monster1"("name") === src.name and $"Monster2"("name") === target.name)
-    val result: Int = distance.collect()(0).getInt(0)
-    return result
-  }
 
   def findDistance(src: Monster, target: Monster): Int = {
     var distance = rddEdges.filter(node => node.Monster1.name == src.name & node.Monster2.name == target.name).collect()(0).distance
     distance
   }
 
-  /*
-  def findDistance(src: Monster, target: Monster) {
-
-      val process = dfEdge.map( row=> (row.getInt(2))
-      )
-      rddEdges.foreach(element => {
-          if (element.Monster1.name == src.name && element.Monster2.name == target.name) {
-              var result = rddEdges.collect()(element.distance)
-              println(result)
-
-
-          }else
-              {null}
-      })
-
-  }
-*/
   //OK choix sort en fonction de la distaance entre monstre
   def SortChoice(monster: Monster, distance: Int): List[Sort] = {
     var result = new Sort()
@@ -199,17 +159,6 @@ object testBroadcast extends App{
     null
   }
 
-  def choice(monster: Monster, target: Monster, edges: RDD[edge], number : Array[Int]): (Int, (Monster, Array[Int])) = {
-    val r = new Random()
-    val rand = r.nextInt(100)
-    val odd = monster.HP * 100 / monster.maxHP
-    if (odd + 20 < rand && monster.id == 1 && monster.HP != monster.maxHP) {
-      monster.Heal(15)
-      Tuple2(monster.id, (monster,number))
-    }
-    else attack(monster, target, edges, number)
-  }
-
   def attack(monster: Monster, target: Monster, edges: RDD[edge], number : Array[Int]): (Int, (Monster, Array[Int])) = {
     //var messageMonster = new ArrayBuffer[(Monster, String)]()
     if(monster.HP == 0 | target.HP == 0 | monster.counterAtt == monster.maxAtt) return Tuple2(target.id, (target, number))
@@ -227,17 +176,17 @@ object testBroadcast extends App{
         //println(monster.name + " attaque ")
         //println(monster.name + " utilise " + chosenSort.name)
         monster.Attack(target, chosenSort)
-        println(monster.name + " utilise " + chosenSort.name + " sur " + target.name+target.id)
+        println(monster.name + " utilise " + chosenSort.name + " sur " + target.name)
         if (target.HP == 0) {
           //messageMonster += Tuple2(target, "mort")
-          println(target.name + target.id + " est mort !")
+          println(target.name + " est mort !")
         }
         else {
           //messageMonster += Tuple2(target, target.HP.toString)
         }
       }
       else { //messageMonster += Tuple2(target, target.name + " a parré l'attque de " + monster.name)
-        println(target.name+target.id + " a parré l'attque de " + monster.name+monster.id)
+        println(target.name+ " a parré l'attque de " + monster.name)
       }
     }
     //messageMonster.foreach(println)
@@ -309,40 +258,47 @@ object testBroadcast extends App{
 
   var i = 1
   while(!teamB.hasLost() && !teamA.hasLost()){
-    println(teamA.monsters.size)
-    println(teamB.monsters.size)
+    println("Reste dans l'équipe A : " + teamA.monsters.size)
+    println("Reste dans l'équipe B : " +teamB.monsters.size)
+    println()
+    println("Messages : ")
     var rddMessageTest = rddGraph.flatMap {
       case (_, monster) => {
         monster._2.flatMap {
           x =>
-            var message = attack(monster._1, broad.value(x-1)._2._1, rddEdges, broad.value(x-1)._2._2)
+            var message = attack(broad.value(monster._1.id-1)._2._1, broad.value(x-1)._2._1, rddEdges, broad.value(x-1)._2._2)
             Array(message)
         }
       }
     }//.reduceByKey((a, b) => if (a._1.HP < b._1.HP) a else b)
     //rddMessageTest.reduceByKey((a, b) => a._1.HP = a._1.maxHP - (a._1.maxHP - a._1.HP) - (b._1.maxHP - b._1.HP))
 
-   /* for(i <- 0 to 4){
+    //println("Fin des messages")
+
+    rddMessageTest.localCheckpoint()
+    /*for(i <- 0 to 4){
       var t = graph(0)._2._2.flatMap{
        x=> var message=attack(graph(0)._2._1, broad.value(x-1)._2._1, rddEdges, broad.value(x-1)._2._2)
           Array(message)
       }
     }*/
 
-    rddMessageTest.toDF().show(1,false)
+    //rddMessageTest.localCheckpoint()
+    rddMessageTest.toDF().show(0,false)  //Déclencheur
 
-    /*for(i <- 0 to 4){
+    for(i <- 0 to 4){
       var t = graph(0)._2._2.flatMap{
         x=> var message=attack(graph(0)._2._1, broad.value(x-1)._2._1, rddEdges, broad.value(x-1)._2._2)
           Array(message)
       }
-    }*/
+    }
 
     //rddGraph.toDF().show(false)
-
+    //rddMessageTest.localCheckpoint()
     rddGraph = rddGraph.union(rddMessageTest)
       .reduceByKey((a, b) => if (a._1.HP < b._1.HP) a else b)
 
+    //rddGraph.localCheckpoint()
     rddGraph.toDF().show(false)
 
     //rddGraph.collect().foreach(println)
@@ -350,7 +306,11 @@ object testBroadcast extends App{
       Array(monster._2._1.id)
     }).collect()
 
+    //var tmp = rddGraph
+
+    //broad = sc.broadcast(tmp.collect())
     broad.value.foreach(x => x._2._1.counterAtt = 0)
+    //rddGraph = rddGraph.map{ x => x._2._1.counterAtt = 0}
 
     println("tour: "+ i)
     removeTeam(teamA, idMort)
