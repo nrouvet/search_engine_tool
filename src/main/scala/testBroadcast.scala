@@ -1,11 +1,12 @@
 import org.apache.spark.{SparkConf, SparkContext}
 import org.apache.spark.rdd.RDD
 import org.apache.spark.sql.SparkSession
+import testMessage.{graph, sc}
 
 import scala.collection.mutable.ArrayBuffer
 import scala.util.Random
 
-object testMessage extends App {
+object testBroadcast extends App{
   val conf = new SparkConf()
     .setAppName("BDDExo2")
     .setMaster("local[8]")
@@ -32,15 +33,20 @@ object testMessage extends App {
   var teamB = new Team()
 
   var worgs1 = Monster(4, "Worgs Rider", "B", 33,50, List(hit), 1)
-  var warlord = Monster(2, "Le Warlord", "B", 33, 30, List(hit), 1)
-  var barbare = Monster(3, "Barbares Orc", "B", 33, 30, List(hit), 1)
-  var barbare2 = Monster(5, "Barbares Orc", "B", 33, 50, List(hit), 1)
-  var barbare3 = Monster(6, "Barbares Orc", "B", 33, 30, List(hit), 1)
-  var barbare4 = Monster(7, "Barbares Orc", "B", 33, 30, List(hit), 1)
-  var barbare5 = Monster(8, "Barbares Orc", "B", 33, 50, List(hit), 1)
-  var barbare6 = Monster(9, "Barbares Orc", "B", 33, 30, List(hit), 1)
-  var barbare7 = Monster(10, "Barbares Orc", "B", 33, 30, List(hit), 1)
-
+  var warlord = Monster(2, "Le Warlord", "B", 33, 33, List(hit), 1)
+  var barbare = Monster(3, "Barbares Orc", "B", 33, 33, List(hit), 1)
+  var barbare2 = Monster(5, "Barbares Orc", "B", 33, 33, List(hit), 1)
+  var barbare3 = Monster(6, "Barbares Orc", "B", 33, 33, List(hit), 1)
+  var barbare4 = Monster(7, "Barbares Orc", "B", 33, 33, List(hit), 1)
+  var barbare5 = Monster(8, "Barbares Orc", "B", 33, 33, List(hit), 1)
+  /*var barbare6 = Monster(9, "Barbares Orc", "B", 33, 33, List(hit), 1)
+  var barbare7 = Monster(10, "Barbares Orc", "B", 33, 33, List(hit), 1)
+  var barbare8 = Monster(11, "Barbares Orc", "B", 33, 33, List(hit), 1)
+  var barbare9 = Monster(12, "Barbares Orc", "B", 33, 33, List(hit), 1)
+  var barbare10 = Monster(13, "Barbares Orc", "B", 33, 33, List(hit), 1)
+  var barbare11 = Monster(14, "Barbares Orc", "B", 33, 33, List(hit), 1)
+  var barbare12 = Monster(15, "Barbares Orc", "B", 33, 33, List(hit), 1)
+  var barbare13 = Monster(16, "Barbares Orc", "B", 33, 33, List(hit), 1)*/
 
   teamB.addMonster(worgs1)
   teamB.addMonster(warlord)
@@ -49,8 +55,14 @@ object testMessage extends App {
   teamB.addMonster(barbare3)
   teamB.addMonster(barbare4)
   teamB.addMonster(barbare5)
-  teamB.addMonster(barbare6)
+  /*teamB.addMonster(barbare6)
   teamB.addMonster(barbare7)
+  teamB.addMonster(barbare8)
+  teamB.addMonster(barbare9)
+  teamB.addMonster(barbare10)
+  teamB.addMonster(barbare11)
+  teamB.addMonster(barbare12)
+  teamB.addMonster(barbare13)*/
 
   //println("listMonstreTeamB")
   //println(teamB.monsters.size)
@@ -70,15 +82,26 @@ object testMessage extends App {
   println("EquipeB")
   teamB.monsters.foreach(x => println(x.name))
 
-  var graph: Array[(Int, (Monster, Array[Int]))] = Array((1, (solar, Array(2, 3, 4, 5, 6, 7, 8, 9, 10))), (2,(warlord, Array(1))), (3, (barbare, Array(1))), (4,(worgs1, Array(1))), (5, (barbare2, Array(1))),
+  var graph: Array[(Int, (Monster, Array[Int]))] = Array((1, (solar, Array(2, 3, 4, 5, 6, 7, 8/*, 9, 10, 11, 12, 13, 14, 15, 16*/))),
+    (2,(warlord, Array(1))),
+    (3, (barbare, Array(1))),
+    (4,(worgs1, Array(1))),
+    (5, (barbare2, Array(1))),
     (6, (barbare3, Array(1))),
     (7, (barbare4, Array(1))),
-    (8, (barbare5, Array(1, 2))),
-    (9, (barbare6, Array(1, 8))),
-    (10, (barbare7, Array(1, 9)))
+    (8, (barbare5, Array(1)))/*,
+    (9, (barbare6, Array(1))),
+    (10, (barbare7, Array(1))),
+    (11, (barbare8, Array(1))),
+    (12, (barbare9, Array(1))),
+    (13, (barbare10, Array(1))),
+    (14, (barbare11, Array(1))),
+    (15, (barbare12, Array(1))),
+    (16, (barbare13, Array(1)))*/
   )
 
-
+  var broad = sc.broadcast(graph)
+  //broad.value(0)._2._1.id=500
 
 
   var edges = Array.empty[edge]
@@ -100,7 +123,7 @@ object testMessage extends App {
 
 
   var rddEdges = sc.makeRDD(edges)
-  var rddGraph = sc.makeRDD(graph).persist()
+  var rddGraph = sc.makeRDD(graph)
 
   //rddGraph.distinct().collect().foreach(println)
   //println(rddGraph.collect()(0))
@@ -159,7 +182,7 @@ object testMessage extends App {
     var listSortResult = List.empty[Sort]
 
     for (i <- 0 until monster.listSort.length) {
-      if (monster.listSort(i).distance >= distance) {
+      if (monster.listSort(i).distance >= distance && monster.listSort(i).listPower.size > monster.counterAtt) {
         result = monster.listSort(i)
         listSortResult = listSortResult :+ result
       }
@@ -189,7 +212,7 @@ object testMessage extends App {
 
   def attack(monster: Monster, target: Monster, edges: RDD[edge], number : Array[Int]): (Int, (Monster, Array[Int])) = {
     //var messageMonster = new ArrayBuffer[(Monster, String)]()
-    if(monster.HP == 0 | target.HP == 0) return Tuple2(target.id, (target, number))
+    if(monster.HP == 0 | target.HP == 0 | monster.counterAtt == monster.maxAtt) return Tuple2(target.id, (target, number))
     if (monster.equipe != target.equipe) {
       val r = new Random()
       var rand = 1 + r.nextInt(19)
@@ -292,25 +315,42 @@ object testMessage extends App {
       case (_, monster) => {
         monster._2.flatMap {
           x =>
-            var message = attack(monster._1, rddGraph.filter(m => m._1 == x).first()._2._1, rddEdges, rddGraph.filter(m => m._1 == 1).first()._2._2)
+            var message = attack(monster._1, broad.value(x-1)._2._1, rddEdges, broad.value(x-1)._2._2)
             Array(message)
         }
       }
-    }
-    rddMessageTest.reduceByKey((a, b) => if (a._1.HP != b._1.HP) b else a)
+    }//.reduceByKey((a, b) => if (a._1.HP < b._1.HP) a else b)
+    //rddMessageTest.reduceByKey((a, b) => a._1.HP = a._1.maxHP - (a._1.maxHP - a._1.HP) - (b._1.maxHP - b._1.HP))
 
+   /* for(i <- 0 to 4){
+      var t = graph(0)._2._2.flatMap{
+       x=> var message=attack(graph(0)._2._1, broad.value(x-1)._2._1, rddEdges, broad.value(x-1)._2._2)
+          Array(message)
+      }
+    }*/
 
-    rddMessageTest.toDF().show(100,false)
+    rddMessageTest.toDF().show(1,false)
+
+    /*for(i <- 0 to 4){
+      var t = graph(0)._2._2.flatMap{
+        x=> var message=attack(graph(0)._2._1, broad.value(x-1)._2._1, rddEdges, broad.value(x-1)._2._2)
+          Array(message)
+      }
+    }*/
 
     //rddGraph.toDF().show(false)
 
-     rddGraph = rddGraph.union(rddMessageTest)
-      .reduceByKey((a, b) => if (a._1.HP != b._1.HP) b else a)
+    rddGraph = rddGraph.union(rddMessageTest)
+      .reduceByKey((a, b) => if (a._1.HP < b._1.HP) a else b)
+
+    rddGraph.toDF().show(false)
 
     //rddGraph.collect().foreach(println)
     var idMort = rddMessageTest.filter(f=> f._2._1.HP == 0).flatMap(monster => {
       Array(monster._2._1.id)
     }).collect()
+
+    broad.value.foreach(x => x._2._1.counterAtt = 0)
 
     println("tour: "+ i)
     removeTeam(teamA, idMort)
@@ -350,20 +390,20 @@ object testMessage extends App {
   //println("message")
   //var rddMessage = sc.makeRDD(attack(solar,warlord,rddEdges))
   //rddMessage.toDF().show(truncate =false)
-/*
+  /*
 
-  //println("test filter mort")
-  var idMort = rddMessageTest.filter(f => f._2.contains("mort")).flatMap(monster => {
-    Array(monster._1)
-  }).collect()
-  //idMort.foreach(println)
-  //println("new rdd")
-  var newRdd = rddMessageTest.filter(f=> !f._2.contains("mort")).map(monster => {
-    monster._1
-  }).collect()
+    //println("test filter mort")
+    var idMort = rddMessageTest.filter(f => f._2.contains("mort")).flatMap(monster => {
+      Array(monster._1)
+    }).collect()
+    //idMort.foreach(println)
+    //println("new rdd")
+    var newRdd = rddMessageTest.filter(f=> !f._2.contains("mort")).map(monster => {
+      monster._1
+    }).collect()
 
-  newRdd.foreach(println)
-*/
+    newRdd.foreach(println)
+  */
 
 
   //removeTeam(teamA, idMort)
@@ -463,5 +503,4 @@ object testMessage extends App {
     println("test")
 
 */
-
 }
