@@ -1,7 +1,6 @@
-import org.apache.spark.{SparkConf, SparkContext}
 import org.apache.spark.sql.SparkSession
+import org.apache.spark.{SparkConf, SparkContext}
 
-import scala.collection.mutable.ArrayBuffer
 import scala.util.Random
 
 
@@ -65,6 +64,9 @@ object main extends App {
   teamB.addMonster(worgs9)
 
 
+
+
+
   var solar = Monster(1, "Solar", "A", 50, 50, List(testAttackProche, testAttackLoin), 4)
 
   teamA.addMonster(solar)
@@ -92,40 +94,12 @@ object main extends App {
   )
 
   var broad = sc.broadcast(graph)
-  //broad.value(0)._2._1.id=500
 
-
-  var edges = Array.empty[edge]
-  //var edges = Array((1,(solar, worgs, 50)), (2, (solar, warlord, 50)), (3, (solar, barbare, 110)),
-  //      (4, (worgs, warlord, 50)), (5, (warlord, barbare, 50)))
-
-  for (i <- 0 until graph.length) {
-    for (j <- 0 until graph(i)._2._2.length) {
-      if (graph(graph(i)._2._2(j) - 1)._2._1.equipe == graph(i)._2._1.equipe) {
-        var tmp = edge(graph(i)._2._1, graph(graph(i)._2._2(j) - 1)._2._1, 20)
-        edges = edges :+ tmp
-      }
-      else {
-        var tmp = edge(graph(i)._2._1, graph(graph(i)._2._2(j) - 1)._2._1, 40)
-        edges = edges :+ tmp
-      }
-    }
-  }
-
-
-  var rddEdges = sc.makeRDD(edges)
   var rddGraph = sc.makeRDD(graph)
 
   import session.implicits._
 
   var dfGraph = rddGraph.toDF()
-  var dfEdge = rddEdges.toDF()
-
-
-  def findDistance(src: Monster, target: Monster): Int = {
-    var distance = rddEdges.filter(node => node.Monster1.name == src.name & node.Monster2.name == target.name).collect()(0).distance
-    distance
-  }
 
   //OK choix sort en fonction de la distaance entre monstre
   def SortChoice(monster: Monster): List[Sort] = {
@@ -181,11 +155,6 @@ object main extends App {
     Tuple2(target.id, (target,number))
   }
 
-  var myRDD = rddGraph.flatMap(monster => {
-    val messageMonster = new ArrayBuffer[(Monster, String)]
-    messageMonster :+ Tuple2(Monster, null)
-    messageMonster
-  })
   println("début du combat ")
   println("*****************")
 
