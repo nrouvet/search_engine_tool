@@ -9,7 +9,7 @@ import scala.util.Random
 object testBroadcast extends App{
   val conf = new SparkConf()
     .setAppName("BDDExo2")
-    .setMaster("local[8]")
+    .setMaster("local[*]")
 
   val sc = new SparkContext(conf)
   sc.setLogLevel("ERROR")
@@ -20,10 +20,10 @@ object testBroadcast extends App{
     .config("spark.some.config.option", "some-value")
     .getOrCreate()
 
-  var testAttackProche = Sort("sword", false, List(35, 30, 25, 20), 50, 3, 6)
-  var testAttackLoin = Sort("elbow", false, List(30, 25, 20), 120, 2, 6)
+  var testAttackProche = Sort("sword", false, List(35, 30, 25, 20), 3, 6)
+  var testAttackLoin = Sort("elbow", false, List(30, 25, 20), 2, 6)
 
-  var hit = Sort("hit", false, List(10), 50, 3, 6)
+  var hit = Sort("hit", false, List(10), 3, 6)
 
   var listSort = List(testAttackLoin, testAttackProche)
 
@@ -38,15 +38,15 @@ object testBroadcast extends App{
   var barbare2 = Monster(4, "Barbares Orc2", "B", 33, 33, List(hit), 1)
   var barbare3 = Monster(5, "Barbares Orc3", "B", 33, 33, List(hit), 1)
   var barbare4 = Monster(6, "Barbares Orc4", "B", 33, 33, List(hit), 1)
-  var worgs1 = Monster(7, "Worgs Rider1", "B", 33,50, List(hit), 1)
+  var worgs1 = Monster(7, "Worgs Rider1", "B", 33,33, List(hit), 1)
   var worgs2 = Monster(8, "Worgs Rider2", "B", 33, 33, List(hit), 1)
   var worgs3 = Monster(9, "Worgs Rider3", "B", 33, 33, List(hit), 1)
   var worgs4 = Monster(10, "Worgs Rider4", "B", 33, 33, List(hit), 1)
   var worgs5 = Monster(11, "Worgs Rider5", "B", 33, 33, List(hit), 1)
-  /*var worgs6 = Monster(12, "Worgs Rider6", "B", 33, 33, List(hit), 1)
+  var worgs6 = Monster(12, "Worgs Rider6", "B", 33, 33, List(hit), 1)
   var worgs7 = Monster(13, "Worgs Rider7", "B", 33, 33, List(hit), 1)
   var worgs8 = Monster(14, "Worgs Rider8", "B", 33, 33, List(hit), 1)
-  var worgs9 = Monster(15, "Worgs Rider9", "B", 33, 33, List(hit), 1)*/
+  var worgs9 = Monster(15, "Worgs Rider9", "B", 33, 33, List(hit), 1)
 
 
   teamB.addMonster(warlord)
@@ -59,10 +59,10 @@ object testBroadcast extends App{
   teamB.addMonster(worgs3)
   teamB.addMonster(worgs4)
   teamB.addMonster(worgs5)
-  /*teamB.addMonster(worgs6)
+  teamB.addMonster(worgs6)
   teamB.addMonster(worgs7)
   teamB.addMonster(worgs8)
-  teamB.addMonster(worgs9)*/
+  teamB.addMonster(worgs9)
 
   //println("listMonstreTeamB")
   //println(teamB.monsters.size)
@@ -83,7 +83,7 @@ object testBroadcast extends App{
   //println("EquipeB")
   //teamB.monsters.foreach(x => println(x.name))
 
-  var graph: Array[(Int, (Monster, Array[Int]))] = Array((1, (solar, Array(2, 3, 4, 5, 6, 7, 8, 9, 10, 11/*, 12, 13, 14, 15*/))),
+  var graph: Array[(Int, (Monster, Array[Int]))] = Array((1, (solar, Array(2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15))),
     (2,(warlord, Array(1))),
     (3, (barbare1, Array(1))),
     (4, (barbare2, Array(1))),
@@ -93,11 +93,11 @@ object testBroadcast extends App{
     (8, (worgs2, Array(1))),
     (9, (worgs3, Array(1))),
     (10, (worgs4, Array(1))),
-    (11, (worgs5, Array(1)))/*,
+    (11, (worgs5, Array(1))),
     (12, (worgs6, Array(1))),
     (13, (worgs7, Array(1))),
     (14, (worgs8, Array(1))),
-    (15, (worgs9, Array(1)))*/
+    (15, (worgs9, Array(1)))
   )
 
   var broad = sc.broadcast(graph)
@@ -137,12 +137,12 @@ object testBroadcast extends App{
   }
 
   //OK choix sort en fonction de la distaance entre monstre
-  def SortChoice(monster: Monster, distance: Int): List[Sort] = {
+  def SortChoice(monster: Monster): List[Sort] = {
     var result = new Sort()
     var listSortResult = List.empty[Sort]
 
     for (i <- 0 until monster.listSort.length) {
-      if (monster.listSort(i).distance >= distance && monster.listSort(i).listPower.size > monster.counterAtt) {
+      if (monster.listSort(i).listPower.size > monster.counterAtt) {
         result = monster.listSort(i)
         listSortResult = listSortResult :+ result
       }
@@ -159,13 +159,13 @@ object testBroadcast extends App{
     null
   }
 
-  def attack(monster: Monster, target: Monster, edges: RDD[edge], number : Array[Int]): (Int, (Monster, Array[Int])) = {
+  def attack(monster: Monster, target: Monster, number : Array[Int]): (Int, (Monster, Array[Int])) = {
     //var messageMonster = new ArrayBuffer[(Monster, String)]()
     if(monster.HP == 0 | target.HP == 0 | monster.counterAtt == monster.maxAtt) return Tuple2(target.id, (target, number))
     if (monster.equipe != target.equipe) {
       val r = new Random()
       var rand = 1 + r.nextInt(19)
-      val chosenSort = choice(monster, SortChoice(monster, findDistance(monster, target)))
+      val chosenSort = choice(monster, SortChoice(monster))
       if (chosenSort == null) {
         //messageMonster += Tuple2(monster, monster.name + " ne peut pas attaquer ! Il est trop loin de " + target.name + "!")
         println(monster.name + " ne peut pas attaquer ! Il est trop loin de " + target.name + "!")
@@ -266,7 +266,7 @@ object testBroadcast extends App{
       case (_, monster) => {
         monster._2.flatMap {
           x =>
-            var message = attack(broad.value(monster._1.id-1)._2._1, broad.value(x-1)._2._1, rddEdges, broad.value(x-1)._2._2)
+            var message = attack(broad.value(monster._1.id - 1)._2._1, broad.value(x - 1)._2._1, broad.value(x - 1)._2._2)
             Array(message)
         }
       }
@@ -274,8 +274,16 @@ object testBroadcast extends App{
     //rddMessageTest.reduceByKey((a, b) => a._1.HP = a._1.maxHP - (a._1.maxHP - a._1.HP) - (b._1.maxHP - b._1.HP))
 
     //println("Fin des messages")
+    /*var rddMessageTest = rddGraph
+    for(i <- 0 until graph.length){
+        rddMessageTest.union(sc.makeRDD(graph(i)._2._2.flatMap {
+          x =>
+            var message = attack(broad.value(i)._2._1, broad.value(x-1)._2._1, rddEdges, broad.value(x-1)._2._2)
+            Array(message)
+        }))
+      }*/
 
-    rddMessageTest.localCheckpoint()
+    //rddMessageTest.localCheckpoint()
     /*for(i <- 0 to 4){
       var t = graph(0)._2._2.flatMap{
        x=> var message=attack(graph(0)._2._1, broad.value(x-1)._2._1, rddEdges, broad.value(x-1)._2._2)
@@ -284,14 +292,14 @@ object testBroadcast extends App{
     }*/
 
     //rddMessageTest.localCheckpoint()
-    rddMessageTest.toDF().show(0,false)  //Déclencheur
+    //rddMessageTest.toDF().show(0,false)  //Déclencheur
 
-    for(i <- 0 to 4){
+    /*for(i <- 0 to 4){
       var t = graph(0)._2._2.flatMap{
         x=> var message=attack(graph(0)._2._1, broad.value(x-1)._2._1, rddEdges, broad.value(x-1)._2._2)
           Array(message)
       }
-    }
+    }*/
 
     //rddGraph.toDF().show(false)
     //rddMessageTest.localCheckpoint()

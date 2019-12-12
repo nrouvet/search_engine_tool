@@ -22,10 +22,10 @@ object exo2 extends App {
       .config("spark.some.config.option", "some-value")
       .getOrCreate()
 
-    var testAttackProche = Sort("sword",false,List(35,30,25,20),50, 3, 6)
-    var testAttackLoin = Sort("elbow",false,List(30, 25, 20),120, 2, 6)
+    var testAttackProche = Sort("sword",false,List(35,30,25,20), 3, 6)
+    var testAttackLoin = Sort("elbow",false,List(30, 25, 20), 2, 6)
 
-    var hit = Sort("hit",false,List(10),50, 3, 6)
+    var hit = Sort("hit",false,List(10), 3, 6)
 
     var listSort = List(testAttackLoin,testAttackProche)
 
@@ -124,10 +124,9 @@ object exo2 extends App {
         var listSortResult = List.empty[Sort]
 
         for (i <- 0 until monster.listSort.length) {
-            if(monster.listSort(i).distance >= distance) {
+
                 result = monster.listSort(i)
                 listSortResult = listSortResult:+result
-            }
         }
         return listSortResult
     }

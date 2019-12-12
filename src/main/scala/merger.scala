@@ -58,6 +58,8 @@ object merger extends App {
 
   var merge = file1.join(file2, "name")
 
-  toJson(merge)
+  merge.show(1000, false)
+
+  //toJson(merge)
 
 }

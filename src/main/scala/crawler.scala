@@ -212,7 +212,7 @@ object crawler extends App {
   //println(result.collect()(0)._1)
   //result.collect().foreach(println)
 
-
+/*
   import session.implicits._
   val df = result.toDF("sort","monsters")
   df.show(200,true)
@@ -228,6 +228,6 @@ object crawler extends App {
 
   val reseachrSort = df.select($"monsters").filter($"sort"===nameSort)
 
-  reseachrSort.show()
+  reseachrSort.show()*/
 
 }
